@@ -1,0 +1,190 @@
+# Assignment 1 - Review of Basic Statistical Concepts
+**Created by John Palowitch, UNC Chapel Hill**
+<br><br>
+In this assignment, you will do Simple Random Sampling and simulation of random variables to illustrate statistical concepts and methods.  **Be sure to title all axes and plots appropriately. You will lose points for plot or axes titles that are incorrect, ambiguous, or missing.**
+
+<br><br>
+**Part 1**
+
+1. Into your working directory, you have placed two populations of size 10,000, "pop1.txt" and "pop2.txt". Assume they each have mean $\mu = 5$ and standard deviation $\sigma = 4$. The first two lines in the codeblock below will load them into your **R** workspace once you have placed them in your working directory for **R**. The third line of code shows how to take an SRS of size 7. 
+<br>
+Check the Normality of each population by taking a SRS of ***size 100*** (from each) and making appropriate plots. Which data set appears more Normal?
+
+```{r p1q1, eval = FALSE} 
+
+#PUT YOUR CODE HERE. When you "knit" the file, output from your code will appear along with your code.
+
+# Loading data
+pop1 <- read.table("pop1.txt")
+pop2 <- read.table("pop2.txt")
+
+#Take SRS of size n=7
+srs1 <- sample(pop1$V1, 7, replace = FALSE)
+
+```
+```{r, eval=TRUE}
+pop1 = read.table("pop1.txt")
+pop2 = read.table("pop2.txt")
+srs1 = sample(pop1$V1, 100, replace = FALSE)
+srs2 = sample(pop2$V1, 100, replace = FALSE)
+qqnorm(srs1, main = "srs1 QQ")
+shapiro.test(srs1)
+qqnorm(srs2, main = "srs2 QQ")
+shapiro.test(srs2)
+
+# pop1 appears to be more normal
+```
+
+
+<br><br><br>
+
+2. Suppose the data set that appears more Normal is in fact truly Normal with mean $\mu = 5$ and standard deviation $\sigma = 4$. Consider the random variable $\bar x$ from a SRS of size 5 from population 1. On a separate sheet of paper, write down $\bar x$'s mean, variance, and anything we can say about its distribution. Then, check the distribution of $\bar x$ by doing the following: 
+
+    a. Take 1,000 simple random samples of size $n = 5$ from population 1. Calculate $\bar x$ from each and store the value in a vector containing all of the $\bar x$'s. ***(You can answer this part by modifying the code in the box below)***
+    b. Make an appropriate plot for your 1,000 $\bar x$'s to assess their distribution.***(You will have to add your own code to the box below to answer this part.)
+    c. In the answer box below, write whether or not the plot you made showed what you expected, and why.
+
+
+    
+```{r p1q2, eval=TRUE} 
+
+n <- 5
+nsims <- 1000
+
+# Define vector of sample means as a numeric vector and give it length equal to 'nsims'
+xbars <- numeric(nsims)
+
+# Take 1000 samples of size n and record means in the vector. The result is a vector containing 1000 sample means.
+for(i in 1:nsims){
+  
+  xbars[i] <- mean(sample(pop1$V1, n, replace = FALSE))
+
+}
+
+qqnorm(xbars, main = "x-bars from Population 1")
+shapiro.test(xbars)
+
+```
+
+    
+```
+Your typed answer to (c) here
+Yes, the plot showed what I had expected. Taking a simple random sample with a relatively normal population will give you a similarly (though slightly more) normal distribution.
+```
+
+<br><br><br>
+
+3. What can we say about the sampling distribution of $\bar x$ from a SRS of size 5 from population 2? This time, make your own 'written answer box' and write down the sampling distribution's mean, variance, and anything else you can say about it. Then repeat parts a.-c. from question 2.
+    
+```{r p1q3, eval = TRUE} 
+n <- 5
+nsims <- 1000
+
+# Define vector of sample means as a numeric vector and give it length equal to 'nsims'
+xbars <- numeric(nsims)
+
+# Take 1000 samples of size n and record means in the vector. The result is a vector containing 1000 sample means.
+for(i in 1:nsims){
+  
+  xbars[i] <- mean(sample(pop2$V1, n, replace = FALSE))
+
+}
+
+qqnorm(xbars, main = "x-bars from Population 2")
+shapiro.test(xbars)
+
+```
+```
+(c) Yes, the plot showed what I had expected. Taking a simple random sample using a small sample size with a non-normal population will give you a similar (though slightly more normalized) distribution.
+```
+
+
+<br><br><br>
+    
+4. The Central Limit Theorem suggests that even for highly non-Normal populations, taking large samples makes $\bar x$ approximately Normal. 
+
+    a. In a new written-answer box, write the "rule-of-thumb" conditions on sample size which validates use of the Central Limit Theorem for statistical inference.
+    b. There is also a rule-of-thumb for taking a *small enough* SRS, with respect to the population size. If the population size is $N$, then in your answer box, write down the largest sample size $n$ which satisfies both rule-of-thumb conditions. 
+    c. Verify that these are good rules by repeating questions 2a-2c with population 2, but this time with the largest appropriate sample size. ***(You should re-do 3a-3c in a new codeblock below and in a new written answer box; don't change your answers to question 3.)***
+    
+```{r p1q4, eval = TRUE} 
+# n = sample size
+# N = population size
+# (a) n >= 30
+# (b) N <= 0.05N
+
+n <- floor(0.05*length(pop2$V1))
+nsims <- 1000
+
+# Define vector of sample means as a numeric vector and give it length equal to 'nsims'
+xbars <- numeric(nsims)
+
+# Take 1000 samples of size n and record means in the vector. The result is a vector containing 1000 sample means.
+for(i in 1:nsims){
+  
+  xbars[i] <- mean(sample(pop2$V1, n, replace = FALSE))
+
+}
+
+qqnorm(xbars, main = "x-bars from Population 2")
+shapiro.test(xbars)
+
+```
+    
+    
+    
+ <br><br><br>   
+    
+*Using `rnorm` to generate random variables is just like taking a SRS from a closely-Normal population (like population 1). For the rest of the assignment, you will use `rnorm` to simulate SRS's from a Normal population.*
+
+<br>
+
+5. Access the documentation in R-Studio by entering the command '?rnorm'. Use this documentation and your ingenuity to simulate 20 random draws from a normal population with mean $\mu=50$ and standard deviation $\sigma=6$. Your answer, when 'knit', should show your code and the output from the code.
+
+```{r, eval = TRUE} 
+
+#Your code here
+rnorm(20, mean = 50, sd = 6)
+
+```
+<br><br>
+
+6. In problems 1-3, we investigated basic properties of the sample mean $\bar x$. In this problem we'll investigate the sample variance $\hat\sigma^2=s^2$.
+
+    a. I mentioned in class that 
+  \[
+  s^2 = \dfrac{\sum_i (X_i - \bar X)^2}{n - 1}
+  \]
+    is an unbiased estimate for $\sigma^2$, the population variance.  If you have had STOR 215 and are mathematically inclined, you should read [this proof](http://pascencio.cos.ucf.edu/classes/Methods/Proof%20that%20Sample%20Variance%20is%20Unbiased.pdf). ***(No work to submit for this part.)***
+    b. For each integer $n$ in the interval [10, 400], do the following: i. simulate a Normal SRS with sample size $n$, $\mu = 5$ and $\sigma = 4$, and calculate $s^2$ for the sample, then ii. store the calculated in a vector with the other calculated values of $s^2$). iii. Then make a scatterplot of  $s^2$ vs. $n$. iv. Finally draw the line $y = \sigma^2$ on the plot. (Hint 1. `For (n in 10:400) {...}`   Hint 2: Use `curve()`)
+    
+***(Your answer should include code and its output.)***
+
+```{r, eval = TRUE} 
+
+#Your code here
+vars = numeric(400-9)
+
+for(n in 10:400) {
+  
+  #xbars = numeric(n)
+  #for (i in 1:1000) {
+  #  xbars[i] = mean(rnorm(n, mean = 5, sd = 4))
+  #}
+  #vars[n-9] = var(xbars)
+  vars[n-9] = var(rnorm(n, mean = 5, sd = 4))
+
+}
+
+plot(c(10:400), vars, xlab="n", ylab="Sample Variance")
+abline(a=16, b=16, h=16, v=16)
+```
+
+<br>
+    c. In an answer box below, describe what is happening to $s^2$ as $n$ gets larger and larger.  Explain why this happens. Approximately what value would you expect for $s^2$ for a sample size of 1,000,000 (Explain)?
+```
+As n grows, s^2 approaches the population variance. For a sample size 1,000,000, the variance will be extremely close to the population variance, 16. This happens because as sample size increases for a normal distribution, sample variance will approach population variance.
+
+```
+<br><br><br>
+  
