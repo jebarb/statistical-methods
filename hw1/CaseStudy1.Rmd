@@ -396,12 +396,14 @@ Recall that *t-scores* are used instead of *z-scores* when the population standa
 ***
 
 ### Question 7:
-Use all your new **R** skills to answer this question: Was the Feb 17th game between UNC and Duke particularly high scoring *for a UNC game*?
+a) Find the t-score for the total score of the UNC-Duke game in question among all UNC games. Use R to make the calculations. Please keep all commands in RMarkdown.
+b) According to the t-score, what percentile did this game come in at for UNC games? Would you call the game especially high-scoring? Explain.
 
 ```{r}
-summary(wins[wins$Team == "North Carolina" | wins$Opponent == "North Carolina",]$Total.Score)
-#No, mean score for UNC games is 151.8, UNC-Duke was 147
 
+unc = wins[wins$Team == "North Carolina" | wins$Opponent == "North Carolina",]
+t = (wins[wins$Date == "2/17/16" & wins$Team == "Duke" & wins$Opponent == "North Carolina",]$Total.Scores - mean(unc$TotalScores)) / sd(unc$Total.Score)
+t
 ```
 
 ***
@@ -414,18 +416,13 @@ You now have all the **R** knowledge you need to make some confidence intervals!
 
 ### Question 8:
 
-a) Make a 95% confidence interval for the number of points UNC scores in a given game.  You will need to think about which **R** commands will give you critical values of the *t*-distribution, and how to use these to make a confidence interval.
+a) Get a vector (list) of UNC team scores.
+b) Decide whether to use z or t for your interval. Use R to find the appropriate critical z-star or t-star.
+c) Use R to do the calcuations. You are basically using R as a calculator, don’t look for fancy commands.
+d) For Part (b), get p-hat, SE(p-hat), etc. and make the CI. (Do you want z-star or t-star?)
 
-```{r, eval = FALSE}
-YOUR CODE HERE
+```{r, eval = TRUE}
 
-```
-
-b) What percentage of games did UNC win in 2015-2016?  Make a 95% confidence interval for their win percentage.
-
-
-```{r, eval = FALSE}
-YOUR CODE HERE
 ```
 
 ***

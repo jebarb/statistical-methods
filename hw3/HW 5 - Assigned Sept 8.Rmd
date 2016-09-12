@@ -1,0 +1,110 @@
+---
+title: 'Homework 5 - CS 1 Questions 7 and 8'
+author: "prepared by Kelly Bodwin and Robin Cunningham"
+output: html_document
+---
+
+In this homework, you will write code for a more scaffolded version of Questions 7 and 8 from Case Study 1.
+
+Run the following **R** code to load the data into your RStudio and take a look at it. Note that the Total.Score variable you need later is included as well.
+
+## Summarizing data
+
+```{r, eval = TRUE}
+# Load dataset
+bball = read.csv("http://kbodwin.web.unc.edu/files/2016/06/basketball.csv")
+
+# Look at dataset
+head(bball)
+
+# Make new variable
+bball$Total.Score = bball$Team.Score + bball$Opponent.Score
+
+```
+
+***
+
+Recall that *t-scores* are used instead of *z-scores* when the population standard deviation is unknown.  The functions `pt` and `qt` work almost same way as `pnorm` and `qnorm`, except that the mean and standard deviation are always 0 and 1, respectively. So to find the area in the t-distribution to the left of t=2.4, for example, you would type `pt(2.4, 17)` if there were 17 degrees of freedom.
+
+***
+
+### Question 7:
+Use all your new **R** skills to answer this question: Was the Feb 17th game between UNC and Duke particularly high scoring *for a UNC game*?
+
+A. The command below creates a subset of bball that includes all games with neutral location and assigns it to the variable Location. Modify this code to get a subset of bball that contains only "North Carolina" as the 'Team' and assign it to the variable UNCGames. Then output UNCGames and you should have 34 of them.
+
+```{r, eval = TRUE}
+UNCGames = bball[bball$Team == "North Carolina",]
+UNCGames
+```
+
+B. Now we want to get a vector called UNCTotalScores by grabbing only the Total.Score column from UNCGames. Then output UNCTotalScores to see that you have 34 of the right kind of numbers.
+
+```{r, eval=TRUE}
+UNCTotalScores = UNCGames$Total.Score
+length(UNCTotalScores)
+```
+
+C. From you output in Part A, you can see that the total score of the UNC-Duke game on February 17 was x=147. We will find the t-score for this value using the mean and standard deviation of the sample of all 34 UNC games. Recall that when we are drawing one value at a time: t = (x-xbar)/s. 
+
+In the code box below, find the mean and standard deviation of the total scores for UNC games, assign those values to `xbar` and `se` and output those calculated values.. Then calculate and ouput the value of t.
+```{r, eval=TRUE}
+xbar <- mean(UNCTotalScores)
+se = sd(UNCTotalScores)
+xbar
+se
+t = (147 - xbar) / se
+t
+```
+
+D. ***Using the t-distribution***, estimate the proportion of all UNC games that have a total score less than that of the UNC-Duke game in question. What is your conclusion, was this a particularly high-scoring game? Explain in an answer box that you create. 
+
+```{r, eval=TRUE} 
+p = pt(t, 33)
+p
+#This was not a particularly high-scoring game as it was a lower-scoring game than average and only approximately 38% of games (theoretically) had lower scores
+```
+
+***
+
+## Confidence Intervals and Proportions
+
+You now have all the **R** knowledge you need to make some confidence intervals.  You may wish to go over your lecture notes for this section, especially to remind yourself how to deal with proportions.
+
+***
+
+### Question 8:
+In this question, you will construct a 95% confidence interval for the number of points UNC scores in a given game.
+
+A. Make a variable called UNCScores by grabbing only the Team.Score column from the table `UNCGames' tat you made earlier. Go ahead and output UNCScores to check your work.
+
+```{r, eval = TRUE}
+UNCScores = UNCGames$Team.Score
+UNCScores
+```
+
+
+B. Make a 95% confidence interval for the number of points UNC scores in a given game.  You will need to use `qt(proportion,df)` with the right proportion and degrees of freedom to get the critical value of the *t*-distribution. Call the endpoints of the distribution `Upper` and `Lower` and output both values.
+
+```{r, eval = TRUE}
+#I am leaving this one to you! 
+#You will need to calculate s, xbar, t* and put them together
+# with the right formula.
+n = 34
+xbar = mean(UNCScores)
+xbar
+se = sd(UNCScores)
+se
+moe = qt(0.975, n - 1) * se / sqrt(n)
+moe
+Upper  = xbar + moe
+Upper
+Lower = xbar - moe
+Lower
+```
+
+##Question 9:
+A readable explanation of ANOVA for difference of means has been placed on the Resources tab of Sakai. Please read it.
+
+##Questions 10-12 
+These will be done on paper and are posted in a Word document along with this assignment. 
