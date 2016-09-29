@@ -1,0 +1,197 @@
+# Assignment 2 - Simple Linear Regression
+**Created by John Palowitch, UNC Chapel Hill**
+output: html_document
+
+Simple Linear Regression
+-------------------------
+<br><br>
+***LSD DATA SET***
+
+*In 1968, a study was performed to attempt to assess the effect of human consumption of LSD on math test scores. Seven subjects were given a dose of LSD. Then, the concentration of LSD in their body tissue was measured, and they were subsequently scored on a math test. In the following questions, we refer to the outcome of this study as the "LSD" data set.*
+
+***NOTE: If you have trouble getting and reading lsd.txt, the file only has 8 lines. You may be able to improvise.***
+
+1. In this question you will perform a basic simple linear regression analysis with the LSD data. Load the `lsd` data set into **R** with the given code line. Print the data set.
+    ```{r q1_load, eval = TRUE}
+    lsd <- read.table("lsd.txt", header = TRUE)
+   
+    #Print lsd
+    print(lsd)
+    
+    
+    ```
+a. Consider the simple linear regression model
+    \[
+    \text{Score} = \beta_0 + \beta_1*(\text{Tissue_conc}) + \epsilon
+    \]
+where $\epsilon\sim{N}(0, \sigma^2)$. Write code to calculate the quantities below for the regression of `Score` on `Tissue_conc`, **without** using R's `lm` function (i.e., using only the formulas given in class). Print these quantities, in order. Note that you may know some of these quantities by another name.
+<br>
+    i. $r$ and $R^2$
+    ii. $\hat \beta_1$ 
+    iii. $\hat \beta_0$
+    iv. $\hat \sigma^2$
+
+    ```{r q1a, eval = TRUE}
+#Your code here to calculate the variables
+beta1 = function(r, sY, sX) {
+  if (sX == 0) {
+    print("sX cannot be 0")
+    return(NA)
+  }
+  return(r * sY / sX)
+}
+
+beta0 = function(r, sY, sX, y_bar, x_bar) {
+  return(ybar - beta1(r, sY, sX) * x_bar)
+}
+ybar = mean(lsd$Tissue_conc)
+xbar = mean(lsd$Score)
+sY = sd(lsd$Tissue_conc)
+sX = sd(lsd$Score)
+r = cor(lsd$Tissue_conc, lsd$Score)
+b0 = beta0(r, sY, sX, ybar, xbar)
+b1 = beta1(r, sY, sX)
+ #Print the results
+r
+r^2
+b1
+b0
+sY^2
+    ```
+b. Compute and store an `lm` (linear model) object associated with the regression. Print the `summary()` output of the linear model. Ensure the quantities from part (a) match what your summary output shows.
+    ```{r}
+    lsd.lm <- lm(Score ~ Tissue_conc, data = lsd)
+    summary(lsd.lm)
+    ```
+
+
+
+c. Use the output of `lm` to find each of the following. You can write your answers on a sheet of paper to be handed in. Be sure to note that they are answers to "1c. Part i"", etc.
+    i. The $t$-statistic associated with the estimate of $\beta_1$
+    ii. The $p$-value for the hypotheses $H_0:\beta_1 = 0$ vs. $H_1:\beta_1 \ne 0$
+    iii. The 95% confidence interval for $\beta_1$ (This will require calculation.)
+    iv.  $SE_{\hat \beta_1}$
+    v.  Interpret the estimates "Intercept" and "Tissue_conc" in terms of the scenario.
+    vi. According to this regression, what proportion of the variation in test scores can be explained by the model?
+    vii. Would you conclude that "Tissue_conc" can be used to explain differences in test scores? Explain.
+
+<br>
+
+d. Produce a scatterplot of your data, and use **R** to draw the regression line on the plot.
+    ```{r}
+    plot(lsd$Tissue_conc, lsd$Score,
+         xlab = "Tissue Concentration",
+         ylab = "Test Score", main = "LSD Experiment w/Regression Line")
+    abline(lsd.lm)
+    ```
+    e. Compute and print the predicted score of a student with LSD tissue concentration of 2. Interpret this number. If we administer the test to a student with this level of LSD tissue concentration, are we guaranteed to observe the number you computed? Why or why not? (Answer on your paper sheet as 1.e)
+    ```{r}
+predict_yval <- function(X, Y, x_new){
+  ybar = mean(Y)
+  xbar = mean(X)
+  r = xbar / ybar
+  sY = sd(Y)
+  sX = sd(X)
+
+  return(beta1(r, sY, sX) * x_new + beta0(r, sY, sX, ybar, xbar))
+  
+}
+  
+    ```
+    <br>
+    f. Compute and print the predicted score of a student with no LSD tissue concentration. Interpret this number on paper.
+    ```{r}
+    
+    ```
+    g. Compute and print the predicted score of a student with LSD tissue concentration of 10. Interpret this number. Does anything seem fishy? Why do you suppose this is? (paper)
+    ```{r}
+ 
+    ```
+    h. Write a paragraph on paper giving your conclusions about the effect of LSD on math test performance. You may use both the `lm` output and your plot. In particular, interpret the meaning of the $p$-value and confidence interval you found in part c.
+    i. Plot the residuals versus x and make a QQ plot of the residuals. 
+    ```{r}
+    #Your Code here
+    ```
+    j. Comment on the two diagnostic plots (paper). Do you have any concerns about our linear model?
+<br><br>
+
+### PGA (Professional Golf Association) Data Set
+
+2. The PGA (Professional Golf Association) data set contains the average driving distance and accuracies for pro golfers in 2008. Use the code line below to load the data set into **R**. Consider the regression of `Accuracy` (response) on `Distance` (predictor). Accuracy is the fairway accuracy over the players' holes that year. Distance is their average driving distance that year. Do the following:<br><br>
+    a. Perform and print the summary output of the regression of Accuracy on Distance. Then, on paper, interpret the estimates "(Intercept)" and "distance" in terms of the scenario. Then find each of the following and put their values on paper.
+    ```{r}
+   #load data
+    pga <- read.table("pga.txt", header = TRUE, sep = "\t")
+    
+  #run the appropriate regression here, call it lsd.lm and print the summary  
+   # pga.lm <- lm(PutTheRightStuffHere, data= pga)
+   
+    ```
+
+i. The $p$-value for the hypotheses $H_0:\beta_1 = 0$ vs. $H_1:\beta_1 \ne 0$
+ii. The 95% confidence interval for $\beta_1$ (This will require calculation.)
+iii.  $SE_{\hat \beta_1}$    
+
+    <br>
+    b. Use **R** to make a scatterplot of the data, and draw the line of best fit (remember to label axes and title your plot).
+    ```{r}
+   #scatterplot
+    
+    
+   # abline(pga.lm)
+ 
+    ```
+    c. **R** has built-in functions to make plots associated with post-regression model diagnostics. Use the code below to create these plots but substitute the name you have given to your linear model. We are interested in only the first two diagnostic plots offered automatically by **R**, so I have added the argument `which = 1:2`
+    ```{r}
+   # plot(pga.lm, which=1:2) 
+  
+    ```
+    d. On paper, write 2-3 sentences in a new comment box commenting on and interpreting the plots.
+    
+    <br><br>
+
+3. You will notice that in the PGA data set, there is an extra variable for gender. Looking at the plots you produced in the previous problem, can you tell if this variable is important? Make at least one plot below that could help you guess whether or not gender should play a role in your regression, or in any analysis of the data. On paper, write a few sentences explaining your plot.
+```{r q17, eval = TRUE}
+plot(pga$Distance, pga$Accuracy,
+     xlab = "Distance", ylab = "Accuracy",
+     main = "2008 PGA statistics",
+     col = pga$Gender + 1)
+legend("topright", legend = c("Female", "Male"), col = c("red", "green"), pch = 1)
+```
+
+4. In a code block below, split up the data set into two separate data sets; one for female, one for male. (As in the Marathon data set, Gender 1 represents Females. I believe this is the convention using alphabetical order for the words 'female' and 'male'.) Then:
+    a. Perform a regression analysis for each, print the summary outputs, and make *only* the residual vs. fitted value and Q-Q diagnostic plots for each regression (by setting the `which` parameter of `plot` to `1:2`). **Do the residuals appear more normally distributed for men or for women?** Answer on paper and explain how you arrived at your answer.
+    ```{r}
+    # Regressions and summaries for split data
+
+    
+    # Plots for each data set (men and women)
+
+    ```
+    <br><br>
+    b. Re-create the scatter plot of the data set (with the original overall regression line), but now plot the two gender-specific regression lines along with the main one. Choose different colors for the three lines and include a legend.
+    ```{r}
+    # Scatterplot showing all lines
+    plot(pga$Distance, pga$Accuracy,
+         xlab = "Distance", ylab = "Accuracy",
+         main = "2008 PGA statistics")
+  #abline overall
+    
+  #abline for men
+    
+  #abline for woment
+  
+    #here are reasonable choices for the legend of the plot with all 3 lines:
+    #legend("topright", legend = c("Female", "Male"), col = c("red", "green"), lty = 1)
+    ```
+    c. On paper, write a few sentences stating whether splitting up the data appears to improve the analysis of this data set. You may use either (or both) quantitative support from the `lm` summary output or qualitative support from your plots.
+    <br>
+    d. **Extra Credit**: Let $\beta_{M}$ and $\beta_{F}$ be the true regression coefficients for the two regressions. On a separate sheet of paper, write down the $t$-statistic associated with the hypothesis test $H_0:\beta_{M} = \beta_{F}$ vs. $H_0:\beta_{M}\ne\beta_{F}$. In a code block below, compute and print the $p$-value for this hypothesis test. On paper, write a few sentences explaining and interpreting this result *in non-technical terms*.
+\[
+t = \frac{\hat\beta_F - \hat\beta_M}{\sqrt{SE_{\hat\beta_F}^2 + SE_{\hat\beta_M}^2}},\;\;\;df = \min\{n_F, n_M\}
+\]
+    ```{r}
+    # Computation of p-value
+
+    ```
+

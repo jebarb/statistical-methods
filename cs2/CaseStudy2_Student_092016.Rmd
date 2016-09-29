@@ -1,0 +1,414 @@
+---
+title: "Case Study 2: University tuition"
+author: "Kelly Bodwin"
+output: html_document
+---
+
+## Get the data
+
+We will be attempting to find a linear regression that models college tuition rates, based on a dataset from US News and World Report.  Alas, this data is from 1995, so it is very outdated; still, we will see what we can learn from it.
+
+*****
+### Question 1:
+
+a) The dataset is located at `http://kbodwin.web.unc.edu/files/2016/09/tuition_final.csv`; figure out how to use the code you were given last time for `read.csv( )` and `read.table( )` to read the data into **R** and call it `tuition`. Use the functions we learned last time to familiarize yourself with the data in `tuition`. 
+
+```{r, eval = TRUE}
+ #Your Code Here
+tuition = read.csv("http://kbodwin.web.unc.edu/files/2016/09/tuition_final.csv")
+head(tuition)
+summary(tuition)
+```
+
+b) Make a new variable in `tuition` called `Acc.Rate` that contains the acceptance rate for each university. You may find it handy to use the variables 'Applied' and 'Accepted'.
+
+```{r, eval = TRUE}
+  # YOUR CODE HERE
+tuition$Acc.Rate = tuition$Accepted / tuition$Applied
+head(tuition)
+summary(tuition)
+```
+
+c) Find and print the row of the data that corresponds to UNC ("University of North Carolina at Chapel Hill").
+
+```{r, eval = TRUE}
+  # YOUR CODE HERE
+tuition[tuition$Name == "University of North Carolina at Chapel Hill",]
+```
+
+*****
+## Writing functions
+
+We have seen many examples of using functions in **R**, like `summary( )` or `t.test( )`.  Now you will learn how to write your *own* functions.  Defining a function means writing code that looks something like this:
+
+```{r, eval = TRUE}
+
+my_function <- function(VAR_1, VAR_2){
+  
+  # do some stuff with VAR_1 and VAR_2
+  return(result)
+  
+}
+
+```
+
+Then you run the code in **R** to "teach" it how your function works, and after that, you can use it like you would any other pre-existing function.  For example, try out the following:
+
+```{r, eval = TRUE}
+
+add1 <- function(a, b){
+  
+  # add the variables
+  c = a + b
+  return(c)
+  
+}
+
+add2 <- function(a, b = 3){
+  
+  # add the variables
+  c = a + b
+  return(c)
+  
+}
+
+# Try adding 5 and 7
+add1(5, 7)
+add2(5, 7)
+
+# Try adding one variable
+#add1(5)
+add2(5)
+
+```
+****
+
+### Question 2:
+What was the effect of `b = 3` in the definition of `add2( )`?
+
+```
+The default value for b is 3
+```
+
+****
+
+### Question 3:
+a) Recall that the equations for simple linear regression are:
+$$\beta_1 = r \frac{S_Y}{S_X} \hspace{0.5cm} \beta_0 = \bar{Y} - \beta_1 \bar{X}$$
+
+Write your own functions, called `beta1( )` and `beta0( )` that take as input some combination of `Sx`, `Sy`, `r`, `y_bar`, and `x_bar`, and use that to calculate $\beta_1$ and $\beta_0$.
+
+```{r, eval = TRUE}
+  # YOUR CODE HERE
+
+beta1 = function(r, sY, sX) {
+  if (identical(sX, 0)) {
+    print("sX cannot be 0")
+    return(NA)
+  }
+  return(r * sY / sX)
+}
+
+beta0 = function(r, sY, sX, y_bar, x_bar) {
+  return(ybar - beta1(r, sY, sX) * x_bar)
+}
+
+beta1(1, 1, 0)
+
+```
+
+b) Try your function with `Sx = 0`.  Did it work?  If not, fix your function code.  Explain why it would be a problem to do linear regression with $S_X = 0$.
+
+```
+Cannot divide by zero
+```
+
+****
+
+## Linear Regression by hand
+
+Use the code below to make a scatterplot of college tuition versus average SAT score.
+
+```{r, eval = TRUE}
+
+plot(tuition$Avg.SAT, tuition$Out.Tuition, main = "title", xlab = "label", ylab = "label", pch = 7, cex = 2, col = "blue")
+
+```
+
+*****
+### Question 4:
+a) Make your own scatterplot, but change the input of `plot( )` so that it looks nice. 
+
+```{r, eval = TRUE}
+  # YOUR CODE HERE
+plot(tuition$Avg.SAT, tuition$Out.Tuition, main = "Tuition vs Average SAT Scores", ylab = "Tuition", xlab = "Average SAT Score", pch = 1, cex = 1, col = "blue")
+
+```
+
+
+b) What do `pch` and `cex` do?
+
+```
+pch specifies the symbols used
+cex indicates the amount by which plotting text and symbols are scaled relative to the default size
+```
+
+c) We have used the function `abline( )` to add a vertical line or a horizontal line to a graph.  However, it can also add lines by slope and intercept.  Read the documentation of `abline( )` until you understand how to do this.  Then add a line with slope 10 and intercept 0 to your plot.  
+```{r, eval = TRUE}
+  # YOUR CODE HERE
+plot(tuition$Avg.SAT, tuition$Out.Tuition, main = "Tuition vs Average SAT Scores", ylab = "Tuition", xlab = "Average SAT Score", pch = 1, cex = 1, col = "blue")
+abline(a=0, b=10)
+```
+
+d) Does this line seem to fit the data well?
+
+```
+Not particularly well
+```
+
+****
+
+### Question 5:
+a) Use the functions you already know in **R** and the ones you created, `beta1( )` and `beta0( )`, to find the slope and intercept for a regression line of `Avg.SAT` on `Out.Tuition`.  Remake your scatterplot, and add the regression line.
+
+*(Hint:  You may have some trouble finding the mean and sd because there is some missing data.  Look at the documentation for the functions you use.  What could we add to the function arguments to ignore values of `NA`?)*
+
+```{r, eval = TRUE}
+  # YOUR CODE HERE
+tuition = tuition[!is.na(tuition$Out.Tuition) & !is.na(tuition$Avg.SAT),]
+ybar = mean(tuition$Out.Tuition)
+xbar = mean(tuition$Avg.SAT)
+sY = sd(tuition$Out.Tuition)
+sX = sd(tuition$Avg.SAT)
+r = cor(tuition$Avg.SAT, tuition$Out.Tuition)
+b0 = beta0(r, sY, sX, ybar, xbar)
+b1 = beta1(r, sY, sX)
+paste(ybar, xbar, sY, sX, r, b1, b0)
+plot(tuition$Avg.SAT, tuition$Out.Tuition, main = "Tuition vs Average SAT Scores", ylab = "Tuition", xlab = "Average SAT Score", pch = 1, cex = 1, col = "blue")
+abline(a=b0, b=b1)
+
+```
+
+b) What do you conclude about the relationship between average SAT score and a college's tuition?
+
+```
+I can conclude that there is a correlation between average SAT score and out of state tuition
+```
+
+****
+
+### Question 6:
+a) Write a new function called `predict_yval(X, Y, x_new)` that takes as input a vector of explanatory variables (`X`), a vector of y-variables (`Y`), and a new x-value that we want to predict (`x_new`).  The output of the function should be the predicted y-value for `x_new` from a regression line. *(Hint: You can use functions inside functions.)*
+
+```{r, eval = TRUE}
+
+predict_yval <- function(X, Y, x_new) {
+  X = na.omit(X)
+  Y = na.omit(Y)
+  sY = sd(Y)
+  sX = sd(X)
+  r = cor(X, Y)
+  return(beta1(r, sY, sX)*x_new + beta0(r, sY, sX, mean(Y), mean(X)))
+}
+
+```
+
+b) Now find the average SAT score and tuition of UNC and of Duke, and compare their predicted values to the truth:
+
+```{r, eval = TRUE}
+  # YOUR CODE HERE
+duke_sat_avg = tuition[tuition$Name == "Duke University",]$Avg.SAT
+unc_sat_avg = tuition[tuition$Name == "University of North Carolina at Chapel Hill",]$Avg.SAT
+duke_tuition_avg = tuition[tuition$Name == "Duke University",]$Out.Tuition
+unc_tuition_avg = tuition[tuition$Name == "University of North Carolina at Chapel Hill",]$Out.Tuition
+duke_tuition_prediction = predict_yval(tuition$Avg.SAT, tuition$Out.Tuition, duke_sat_avg)
+unc_tuition_prediction = predict_yval(tuition$Avg.SAT, tuition$Out.Tuition, unc_sat_avg)
+duke_sat_prediction = predict_yval(tuition$Out.Tuition, tuition$Avg.SAT, duke_tuition_avg)
+unc_sat_prediction = predict_yval(tuition$Out.Tuition, tuition$Avg.SAT, unc_tuition_avg)
+cat(duke_sat_avg, unc_sat_avg, duke_tuition_avg, unc_tuition_avg)
+cat(duke_sat_prediction, unc_sat_prediction, duke_tuition_prediction, unc_tuition_prediction)
+```
+
+c) Would you say you are getting a deal at UNC?  How about at Duke?
+
+```
+Not getting a good deal at Duke, getting a great deal at UNC
+```
+***
+
+### `lm()` and diagnostics
+
+You now have functions to calculate the slope and intercept of a linear regression, and to predict values. As you might expect, **R** was already able to do this, using the function `lm( )`.  In class, you saw how to read the output of `lm( )`.  Run the following regression of `Avg.SAT` on `Out.Tuition`, and refamiliarize yourself with the output.
+
+```{r, eval = TRUE}
+  
+  # Make linear model
+  my_lm = lm(Out.Tuition ~ Avg.SAT, data = tuition)
+  summary(my_lm)
+  names(my_lm)
+  plot(tuition$Avg.SAT, tuition$Out.Tuition, main = "Tuition vs Average SAT Scores", ylab = "Tuition", xlab = "Average SAT Score", pch = 1, cex = 1, col = "blue")
+  abline(my_lm)
+  plot(my_lm)
+
+```
+
+Check out `names(my_lm)`.  This will give you a list of information we can access using `$`.  For example, compare `my_lm$coefficents` to your `beta1` and `beta0` outputs.
+
+The output of `lm( )` is made to play nicely with other functions in **R**. For example, try adding `abline(my_lm)` to your scatterplot.  We can also use `lm( )` to check some common diagnostics, to see if the linear model is a good fit for the data.  Try `plot(my_lm)`, and familiarize yourself with the first three plots that are automatically generated.  (The fourth is not covered in this course, so you do not need to worry about it for now.)
+
+***
+
+## Question 7:
+
+a. The variable `Spending` contains the expenditure of the school per student. Suppose we want to make a regression that predicts tuition cost from the expenditure per student.  Make a linear model for `Spending` versus `Out.Tuition`.  Comment on the summary of the model, and plot it on an appropriate scatter plot. Does the model seem to be a good fit for this data?
+```{r, eval = TRUE}
+my_lm = lm(Out.Tuition ~ Spending, data = tuition)
+plot(tuition$Spending, tuition$Out.Tuition, main = "Tuition vs Spending", ylab = "Tuition", xlab = "Spending", pch = 1, cex = 1, col = "blue")
+abline(my_lm)
+
+```
+
+```
+The model is not a very good fit. There are extreme outliers that are skewing the result.
+```
+
+b. Plot the residuals versus the values of `Spending`.  Do you notice any issues? *Hint: Use your own function `predict_yval()` or the built-in function `predict(my_lm)`.  You will need to think about the problem of missing data (`NA`s).*
+
+```{r, eval = TRUE}
+plot(na.omit(tuition$Spending), na.omit(my_lm$residuals), main = "Residuals vs Spending", ylab = "Residuals", xlab = "Spending", col = "blue")
+```
+
+```
+```
+
+
+c. Use `plot()` to look at the automatic diagnostics.  What is each plot showing? What seems to be going wrong here?  Which schools are marked as outliers?
+
+```{r, eval = TRUE}
+plot(my_lm)
+```
+
+```
+The high-spending outlier schools are heavily skewing the model
+```
+
+d. Roughly speaking, an outlier is "influential" if it changes the regression line when you remove it.  Decide for yourself which data points are influential outliers. Recalculate the linear model without any outliers, and plot it on a scatterplot.
+
+```{r, eval = TRUE}
+tuition_spending = tuition[tuition$Spending < 20000,]
+my_lm = lm(Out.Tuition ~ Spending, data = tuition_spending)
+plot(tuition_spending$Spending, tuition_spending$Out.Tuition, main = "Tuition vs Spending", ylab = "Tuition", xlab = "Spending", pch = 1, cex = 1, col = "blue")
+abline(my_lm)
+```
+
+***
+### Question 8:
+a. Now suppose we want to make a regression that predicts tuition cost from the size of the student body.  Make a linear model for `Size` versus `Out.Tuition`.  Comment on the summary of the model, and plot it on an appropriate scatter plot, and use `plot( )` to look at the diagnostics.  Does the model seem to be a good fit for this data?
+```{r, eval = TRUE}
+my_lm = lm(Out.Tuition ~ Size, data=tuition)
+plot(tuition_spending$Size, tuition_spending$Out.Tuition, main = "Tuition vs Size", ylab = "Tuition", xlab = "Size", col = "blue")
+abline(my_lm)
+plot(my_lm)
+```
+
+```
+There does not appear to be a significant correlation between size and tuition
+```
+
+b. Remake your scatterplot, this time including the option `col = tuition$Public`.  What did this change?  Can you use this information to explain why the regression line in (a) did not fit well?
+```{r, eval = FALSE}
+  # YOUR CODE HERE
+```
+
+```
+```
+
+c. Make separate linear regressions of `Size` versus `Out.Tuition` for private schools and for public schools.  Plot both of these, appropriately colored, on your scatterplot.  Comment on the output and diagnostics.
+```{r, eval = FALSE}
+  # YOUR CODE HERE
+```
+
+```
+```
+***
+
+## Multiple Linear Regression
+
+We have seen that a college's tuition relates to its size, its spending per student, and its average SAT score.  We have also seen that this relationship may change based on whether the school is public or private.  Ideally, instead of making separate regressions for each relationship, we could combine them all into a multiple regression. Fortunately, **R** makes this easy with `lm()`.
+
+***
+### Question 9:
+
+a) Run the following code to perform a multiple regression.  Interpret the results.
+
+```{r, eval = FALSE}
+  mult.1 <- lm(Out.Tuition ~ Size + Avg.SAT + Avg.ACT + Spending + Acc.Rate, data = tuition)
+  
+  summary(mult.1)
+```
+
+```
+```
+
+b) We can also mix and match continuous variables with categorical ones.  Let's add `Public` to the regression.  The following two models are slightly different, but give essentially identical output.  What is the difference between them, and why is it important even though the output still the same?
+
+```{r, eval = FALSE}
+  mult.2 <- lm(Out.Tuition ~ Size + Avg.SAT + Avg.ACT + Spending + Public, data = tuition)
+  mult.3 <- lm(Out.Tuition ~ Size + Avg.SAT + Avg.ACT + Spending + factor(Public), data = tuition)
+
+```
+
+```
+```
+
+c) It is still important to check diagnostics in a multiple regression, although it can be harder to track down the source of problems.  Use `plot( )` to look at diagnostics for `mult.3`, and comment.
+
+```{r, eval = FALSE}
+  # YOUR CODE HERE
+```
+
+```
+```
+
+***
+### Question 10:
+a) A big problem in multiple regression is *collinearity*, which means that two or more explanatory variables are correlated with each other. Read the documentation for `pairs( )`, and then use it on the variables involved in `mult.3`.  *Hint:  You can use the option `col = tuition$Public` in `pairs( )`*
+
+```{r, eval = FALSE}
+  # YOUR CODE HERE
+```
+
+b) Do any of the variables seem strongly related?  What is their correlation?
+
+```{r, eval = FALSE}
+  # YOUR CODE HERE
+```
+
+```
+```
+
+c) Explain in your own words why the correlation between the variables you discussed in (a) could be a problem.
+
+```
+```
+***
+
+## Sneak Preview: Interaction Terms
+
+We saw in 12c that whether a school is public or private can affect not only the tuition, but also how the tuition relates to other variables.  In a multiple regression, this effect can be captured through interaction terms, which are expressed by `var1:var2`, and measure how much one variable changes the effect of the other.  
+
+Read the following paragraph from the documentation `?formula` for some shortcuts for including interactions:
+```
+In addition to + and :, a number of other operators are useful in model formulae. The * operator denotes factor crossing: a*b interpreted as a+b+a:b. The ^ operator indicates crossing to the specified degree. For example (a+b+c)^2 is identical to (a+b+c)*(a+b+c) which in turn expands to a formula containing the main effects for a, b and c together with their second-order interactions. The %in% operator indicates that the terms on its left are nested within those on the right. For example a + b %in% a expands to the formula a + a:b. The - operator removes the specified terms, so that (a+b+c)^2 - a:b is identical to a + b + c + b:c + a:c. It can also used to remove the intercept term: when fitting a linear model y ~ x - 1 specifies a line through the origin. A model with no intercept can be also specified as y ~ x + 0 or y ~ 0 + x.
+```
+***
+### Question 11:
+Create your own multiple regression that predicts tuition from whichever variables you choose, as well as some interaction terms between `Public` and other variables.  Don't worry about using any official methods to pick variables; simply try a few things and choose the model that seems best.  Interpret the results; in particular, think very carefully about what the coefficient for an interaction term with `Public` might mean.
+
+```{r, eval = FALSE}
+  # YOUR CODE HERE
+```
+
+```
+```
+***
