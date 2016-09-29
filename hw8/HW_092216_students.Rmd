@@ -34,7 +34,7 @@ where $\epsilon\sim{N}(0, \sigma^2)$. Write code to calculate the quantities bel
     ```{r q1a, eval = TRUE}
 #Your code here to calculate the variables
 beta1 = function(r, sY, sX) {
-  if (sX == 0) {
+  if (identical(sX, 0)) {
     print("sX cannot be 0")
     return(NA)
   }
@@ -44,10 +44,10 @@ beta1 = function(r, sY, sX) {
 beta0 = function(r, sY, sX, y_bar, x_bar) {
   return(ybar - beta1(r, sY, sX) * x_bar)
 }
-ybar = mean(lsd$Tissue_conc)
-xbar = mean(lsd$Score)
-sY = sd(lsd$Tissue_conc)
-sX = sd(lsd$Score)
+xbar = mean(lsd$Tissue_conc)
+ybar = mean(lsd$Score)
+sX = sd(lsd$Tissue_conc)
+sY = sd(lsd$Score)
 r = cor(lsd$Tissue_conc, lsd$Score)
 b0 = beta0(r, sY, sX, ybar, xbar)
 b1 = beta1(r, sY, sX)
@@ -81,36 +81,39 @@ d. Produce a scatterplot of your data, and use **R** to draw the regression line
     ```{r}
     plot(lsd$Tissue_conc, lsd$Score,
          xlab = "Tissue Concentration",
-         ylab = "Test Score", main = "LSD Experiment w/Regression Line")
-    abline(lsd.lm)
+         ylab = "Test Score", main = "LSD Experiment w/Regression Line", col="blue")
+    abline(lsd.lm, col="red")
     ```
     e. Compute and print the predicted score of a student with LSD tissue concentration of 2. Interpret this number. If we administer the test to a student with this level of LSD tissue concentration, are we guaranteed to observe the number you computed? Why or why not? (Answer on your paper sheet as 1.e)
     ```{r}
-predict_yval <- function(X, Y, x_new){
-  ybar = mean(Y)
-  xbar = mean(X)
-  r = xbar / ybar
+predict_yval <- function(X, Y, x_new) {
+  X = na.omit(X)
+  Y = na.omit(Y)
   sY = sd(Y)
   sX = sd(X)
-
-  return(beta1(r, sY, sX) * x_new + beta0(r, sY, sX, ybar, xbar))
-  
+  r = cor(X, Y)
+  return(beta1(r, sY, sX)*x_new + beta0(r, sY, sX, mean(Y), mean(X)))
 }
-  
+predict_yval(lsd$Tissue_conc, lsd$Score, 2)
     ```
     <br>
     f. Compute and print the predicted score of a student with no LSD tissue concentration. Interpret this number on paper.
     ```{r}
-    
+    predict_yval(lsd$Tissue_conc, lsd$Score, 0)
+
     ```
     g. Compute and print the predicted score of a student with LSD tissue concentration of 10. Interpret this number. Does anything seem fishy? Why do you suppose this is? (paper)
     ```{r}
- 
+ predict_yval(lsd$Tissue_conc, lsd$Score, 10)
+
     ```
     h. Write a paragraph on paper giving your conclusions about the effect of LSD on math test performance. You may use both the `lm` output and your plot. In particular, interpret the meaning of the $p$-value and confidence interval you found in part c.
     i. Plot the residuals versus x and make a QQ plot of the residuals. 
     ```{r}
     #Your Code here
+    plot(lsd$Score, na.omit(lsd.lm$residuals), main = "Residuals vs Score", ylab = "Residuals", xlab = "Score", col = "blue")
+    qqnorm(lsd.lm$residuals, col="blue")
+    qqline(lsd.lm$residuals, col="blue")
     ```
     j. Comment on the two diagnostic plots (paper). Do you have any concerns about our linear model?
 <br><br>
@@ -125,6 +128,9 @@ predict_yval <- function(X, Y, x_new){
     
   #run the appropriate regression here, call it lsd.lm and print the summary  
    # pga.lm <- lm(PutTheRightStuffHere, data= pga)
+  pga.lm <- lm(Accuracy ~ Distance, data = pga)
+  summary(pga.lm)
+
    
     ```
 
@@ -136,14 +142,13 @@ iii.  $SE_{\hat \beta_1}$
     b. Use **R** to make a scatterplot of the data, and draw the line of best fit (remember to label axes and title your plot).
     ```{r}
    #scatterplot
-    
-    
-   # abline(pga.lm)
+plot(pga$Distance, pga$Accuracy, main = "Accuracy vs Distance", ylab = "Accuracy", xlab = "Distance", col = "blue")    
+   abline(pga.lm)
  
     ```
     c. **R** has built-in functions to make plots associated with post-regression model diagnostics. Use the code below to create these plots but substitute the name you have given to your linear model. We are interested in only the first two diagnostic plots offered automatically by **R**, so I have added the argument `which = 1:2`
     ```{r}
-   # plot(pga.lm, which=1:2) 
+   plot(pga.lm, which=1:2) 
   
     ```
     d. On paper, write 2-3 sentences in a new comment box commenting on and interpreting the plots.
@@ -163,9 +168,20 @@ legend("topright", legend = c("Female", "Male"), col = c("red", "green"), pch = 
     a. Perform a regression analysis for each, print the summary outputs, and make *only* the residual vs. fitted value and Q-Q diagnostic plots for each regression (by setting the `which` parameter of `plot` to `1:2`). **Do the residuals appear more normally distributed for men or for women?** Answer on paper and explain how you arrived at your answer.
     ```{r}
     # Regressions and summaries for split data
-
+    pga_f = pga[pga$Gender == 1,]
+    pga_m = pga[pga$Gender == 2,]
+    pga_f.lm <- lm(Accuracy ~ Distance, data = pga_f)
+    pga_m.lm <- lm(Accuracy ~ Distance, data = pga_m)
+    summary(pga_f.lm)
+    summary(pga_m.lm)
     
     # Plots for each data set (men and women)
+    plot(pga_f$Distance, pga_f$Accuracy, main = "Female Accuracy vs Distance", ylab = "Accuracy", xlab = "Distance", col = "blue")    
+   abline(pga.lm)
+   plot(pga_m$Distance, pga_m$Accuracy, main = "Male Accuracy vs Distance", ylab = "Accuracy", xlab = "Distance", col = "blue")    
+   abline(pga.lm)
+   plot(pga_f.lm, which=1:2) 
+   plot(pga_m.lm, which=1:2) 
 
     ```
     <br><br>
