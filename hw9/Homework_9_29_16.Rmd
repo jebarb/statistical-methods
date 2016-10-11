@@ -1,0 +1,83 @@
+# Matrices in R
+**Created by John Palowitch, UNC Chapel Hill**
+
+**Edited by Robin Cunningham, UNC Chapel Hill**
+
+
+### Conceptual Questions 
+Please read the document ***Matrices in R.docx*** before completing this assignment. This assignment has two goals:
+
+-Learning new commands in R from a written source.
+
+-Using R for Matrix Calculations
+<br><br>
+1. Suppose:
+  \[
+  \mathbf{A} = \begin{bmatrix}2&3&4&5\\-1&0&3&2\end{bmatrix},\;\;\;\;\mathbf{B} = \begin{bmatrix}4&-1&10&0\\-2&-2&5&6\end{bmatrix}
+  \]
+  \[
+  \mathbf{a} = \begin{bmatrix}6&2&-11&1\end{bmatrix},\;\;\;\;\mathbf{b} = \begin{bmatrix}4\\2\\3\\0\end{bmatrix},\;\;\;\;\mathbf{c} = \begin{bmatrix}-3\\-10\end{bmatrix}
+  \]
+    a. On this page, write down the dimensions of the following (on this sheet, next to the expression). If the operation is not possible, write "N.P."
+        <br>i. $\mathbf{A}^T\mathbf{B}$   4X4 (first one done for you!)
+        <br>ii. $\mathbf{B}\mathbf{A}^T$ 2X2
+        <br>iii. $\mathbf{A}\mathbf{B}$ N.P.
+        <br>iv. $\mathbf{A}^T\mathbf{A}$ 4X4
+        <br>v. $\mathbf{b}^T\mathbf{A}$ N.P.
+        <br>vi. $\mathbf{a}\mathbf{A}^T$ 1X2
+        <br>vii. $\mathbf{B}\mathbf{b}$ 2X1
+        <br>viii. $\mathbf{B}\mathbf{c}^T$ N.P.
+        <br>ix. $\mathbf{a}\mathbf{c}$ N.P.
+        <br>x. $\mathbf{b}\mathbf{a}$ 4X4
+    <br><br>b. Again, write down the dimensions of the following (on this sheet, next to the expression). If the operation is not possible, write "N.P."
+        <br>i. $(\mathbf{A}^T\mathbf{B})^{-1}\mathbf{a}$ N.P.
+        <br>ii. $\mathbf{c}(\mathbf{B}\mathbf{A}^T)^{-1}$ N.P.
+        <br>iii. $(\mathbf{B}^T\mathbf{B})^{-1}\mathbf{B}^T\mathbf{c}$ N.P.
+        <br>iv. $\mathbf{b}^T\mathbf{A}^T\mathbf{c}$ 1X1
+        <br>v. $(\mathbf{B}\mathbf{B}^T)^{-1}\mathbf{B}\mathbf{b}$ 2x1
+      
+        
+### Applied Questions 
+2. In a code block below, compute and print the following matrices and vectors:
+\[
+\mathbf{A} = \begin{bmatrix}-6&0&1\\1&10&7.5\end{bmatrix},\;\;\;\;\mathbf{B} = \begin{bmatrix}-15&1&1\\5.25&1&2.5\end{bmatrix}
+\]
+\[
+\mathbf{a} = \begin{bmatrix}6&2&1\end{bmatrix},\;\;\;\;\mathbf{b} = \begin{bmatrix}2\\-7\end{bmatrix}
+\]
+```{r, eval=TRUE}
+A = matrix(c(-6, 1, 0, 10, 1, 7.5), nrow=2, ncol=3)
+B = matrix(c(-15, 5.25, 1, 1, 1, 2.5), nrow=2, ncol=3)
+a = matrix(c(6, 2, 1), nrow=1, ncol=3)
+b = matrix(c(2, -7), nrow=2, ncol=1)
+A
+B
+a
+b
+```
+
+3. Compute (with **R**, in a new code block below) and print the following products:
+    a. $\mathbf{A}^T\mathbf{B}$
+    b. $\mathbf{B}\mathbf{a}^T$
+    c. $\mathbf{b}^T\mathbf{A}$
+    d. $\mathbf{A}^T\mathbf{b}$
+    e. $\mathbf{a}^T\mathbf{a}$
+    f. $\mathbf{a}\mathbf{a}^T$
+    g. $(\mathbf{A}^T\mathbf{A})^{-1}$
+    h. $(\mathbf{A}^T\mathbf{A})^{-1}\mathbf{A}^T\mathbf{b}$
+    i. $\mathbf{b}^T\mathbf{A}\mathbf{a}^T$
+    j. $\mathbf{a}\mathbf{B}\mathbf{A}^T\mathbf{b}$
+    ```{r, eval=TRUE}
+    t(A) %*% B
+    B %*% t(a)
+    t(b) %*% A
+    t(A) %*% b
+    t(a) %*% a
+    a %*% t(a)
+    #solve(t(A) %*% A)
+    #solve(t(A) %*% A) %*% t(A) %*% b
+    t(b) %*% A %*% t(a)
+    #a %*% B %*% t(A) %*% b
+    ```
+
+
