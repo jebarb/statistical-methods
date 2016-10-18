@@ -1,0 +1,249 @@
+# Homework Assigned 10/13/16 and 10/18/16
+**Created by Robin Cunningham, UNC Chapel Hill**
+output: html_document
+
+Intro to Multiple Linear Regression
+-------------------------
+<br><br>
+***GPA Data Set***
+
+Note that the first question of this homework is the same as the previous homework. This is so that you have the matrices and job runs we need to continue our analysis of this model. ***This assignment begins with Question  2.***
+
+
+***1. Get the data set "College GPA.csv" and put it in your working directory along with this document and the console of R-Studio. Note that all of the code boxes below are set to `eval=FALSE` so that your file will `knit` but you will need to change this to put out your answers.***
+<br><br>
+a. Read in the GPA file and assign it to the handy name provided.
+    ```{r q1_load, eval = TRUE}
+    gpa <- read.csv("College GPA.csv", header = TRUE)
+    gpa
+    ```
+b. Create each of the Matrices, X, Y, and Beta_hat that you will need to solve the normal equations.
+    \[
+       X\hat{B} =Y
+    \]
+Begin by defining variables 
+    \[
+       Y = First year GPA
+    \]
+    \[
+       X1 = Math SAT
+    \]
+    \[
+       X2 = Verbal SAT
+    \]
+    \[
+       X3 = HS Math GPA
+    \]
+    \[
+       X4 = HS English GPA.
+    \]
+Then initialize a Beta_hat vector of all zeros and the appropriate length.
+    ```{r q1a, eval = TRUE}
+    #Initialize vectors
+    k <- ncol(gpa)
+    n <- nrow(gpa)
+    Beta_hat = numeric(length = n)
+    Y <- numeric(n)
+    X1 <- numeric(n)
+    X2 <- numeric(n)
+    X3 <- numeric(n)
+    X4 <- numeric(n)
+    
+    #Assign values to vectors
+    Y <- gpa$First.Yr.GPA
+    X1 <- gpa$Math.SAT
+    X2 <- gpa$Verbal.SAT
+    X3 <- gpa$HS.Math.GPA
+    X4 <- gpa$HS.English.GPA
+
+    ```
+b. We have our variables now, but they are all stored as vectors and we must convert them to matrices. Use `cbind` to create the matrix X. You will need to create a vector of 1's of the appropriate length first. Also, use the `matrix` command to turn Y and Beta_hat into matrices with the correct dimensions. After you have made them, go ahead and print (with labels) all three Matrices for the normal equations with labels.
+    ```{r, eval=TRUE}
+  #Change Beta_hat to a matrix
+  Beta_hat = matrix(Beta_hat, nrow = n, ncol=1)
+  print("Beta_hat = ")
+  Beta_hat
+  #Change Y to a matrix
+  mY = matrix(Y, nrow = n, ncol=1)
+  print("Y = ")
+  mY 
+  #create X 
+  # First create column of ones and convert Xi to columns
+  mones <- matrix(1, nrow=n)
+  mX1 = matrix(X1, nrow = n, ncol=1)
+  mX2 = matrix(X2, nrow=n, ncol=1)
+  mX3 = matrix(X3, nrow=n, ncol=1)
+  mX4 = matrix(X4, nrow=n, ncol=1)
+  # make matrix X
+  X <- cbind(mones, mX1, mX2, mX3, mX4)
+  X
+    ```
+
+<br>
+c. Calculate the least squares values of Beta_hat.  In the calculation of the least squares values, I recommend calculating X^tX first, then the inverse, then Beta_hat.
+<br>
+I went ahead and printed out the Beta_i values for you.
+```{r, eval=TRUE}
+  #Calculate Beta_hat
+  XTX = t(X)%*%X
+  Inverse = solve(XTX)
+  Beta_hat = Inverse%*%t(X)%*%Y
+  Beta_hat
+  
+  #Print individual values of Beta_i
+  labels = matrix(c("Beta_0", "Beta_1", "Beta_2", "Beta_3", "Beta_4"), nrow = 5)
+  beta_summary <- cbind(labels, Beta_hat)
+  beta_summary
+```
+d. Now that you know how `lm` calculates these coefficients, it is ok to use `lm` directly to calculate the least-squares statistics. Do that here and assign the model to the name gpa.mlr. Then get the summary output of the model.
+    ```{r, eval=TRUE}
+
+gpa.mlr <- lm(Y ~ X1 + X2 +X3 + X4)
+summary(gpa.mlr)
+
+    ```
+    <br>
+e. How do your estimates of the parameters compare to R's?(Comment box below)
+
+```
+answer here
+```
+f. Interpret each of the regression paramaters in words. That is, explain what each value means in terms of the scenario.
+```
+answer here
+```
+g. Find a 95% confidence interval for $\beta_4$.(Use either a code-box, a comment box, or both to hold your answer.)
+<br>
+
+h. For a new individual with
+<br>
+MSAT = 640<br>
+VSAT = 540<br>
+HSM = 3.8<br>
+HSE = 3.2<br>
+What is your best estimate for their 1st-year gpa? 
+<br> Please use R to give your answer.
+
+
+***OMIT i. For the person described in Part (h), find a 95% confidence interval for their 1st-year gpa. (Note that s^2 is given in the R output of the linear model.)***
+
+j. We should have done this to start the regression analysis, but make plots of Y versus each of the predictors (4 plots) and discuss what you see. (Try to get everything into this RMarkdown document. No paper this time.)
+
+k. Makes histograms of each of the variables to see if there are any obvious outliers or other odd behavior. Print the histograms and any comments.
+
+l. Plot residuals versus fitted values (Y-hat_i) and the QQ plot of residuals. It is ok to use `lm` for this. Include any comments on what these diagnostic plots indicate.
+
+m. Find a 95% prediction interval for the individual described in Part (h) above. It is ok to use R's `predict` function for this. Interpret the result in terms of the scenario.
+
+<br><br><br>
+***2. Parts (a) through (e) above hopefully built our confidence regarding R, regarding the matrix algebra involved in finding the regression coefficients and in our ability to produce the regression coefficients by hand. 
+<br><br>
+In this question, we will see how to reproduce the Standard Errors of each coefficient using matrix algebra. It turns out there is not much work for this, just a couple of tricks.
+<br> 
+Please render all answers using RMarkdown (no paper).***
+<br>
+a. We learned in class that the matrix $$(X^{t}X)^{-1}$$ basically gives us the Standard Errors for the coefficients. This matrix is so important that it is often called $C$. Assign the appropriate matrix to the variable name $C$ and print the matrix. 
+``` {r, eval = TRUE}
+# Assign the right matrix to the variable C.
+# C <- 
+
+```
+b. As we learned in class, the squares of the Standard Errors of the coefficients are given by the diagonal elements of the matrix $$s^{2}C.$$ So to reproduce those, we need to produce $s^2$. We could just square the ***residual standard error*** (0.2685) in the output of lm, but we can also calculate it with matrices by going through SSE and the degrees of freedom of SSE. In the code block below, use matrix equations from class to calculate the matrix of residuals ("e-hat") and SSE. Print out SSE.
+
+``` {r, eval = TRUE}
+# Calculate SE(Beta_3) by hand
+# ehat = 
+#SSE <- 
+
+```
+<br>
+c. Now calculate $s = \sqrt{MSE}$ using the fact that the degrees of freedom of SSE is $n-k$. Print $s$ and verify that it equals the residual standard error.
+
+``` {r, eval = TRUE}
+# Calculate s by hand.
+#n and k were found above.
+
+```
+
+d. Well that is reassuring. It looks like we can trust R's output for $s$. Now print the matrix $s^{2}C$ and view the squares of the SE(Beta_i)'s on the diagonal. Unfortunately, R still considers $s$ to be a 1X1 matrix, so we have to convert it to a scalar first, before multiplying by $C$. I have done this step for you.
+``` {r, eval = TRUE}
+# view the diagonal after converting s to a number and calculating s^2*C.
+#s <- as.numeric(s)
+
+```
+
+e. You can view the actual Standard Errors of the Coefficients by looking at the square-root of $s^2 C$, but it would be more satisfying to produce a matrix of `my_SEs`. Write a do-loop to do this
+``` {r, eval = FALSE}
+# Make a vector of my_SEs
+# I did it for you, but inspect the code please!!
+my_SEs <- numeric(k) # one term for each coefficient
+for (i in 1:k){
+        my_SEs[i] = sqrt(s^2*C[i,i])
+}
+my_SEs
+```
+<br><br><br>
+
+
+***3. The last thing we have to look at before model selection is prediction intervals for $\hat{Y}$ and confidence intervals for $\mu_Y$. The idea is that a new student comes along with a set of SAT scores and High School grades and we want to make a confidence interval for their 1st-year GPA at university. ***
+<br>
+a. We will switch up the order this time and first use R to calculate the confidence interval for $\mu_Y$ and the prediction interval for $\hat{Y}$. I will even give you the code:
+```{r, eval = TRUE}
+
+#Use gpa.mlr for predition interval
+new_student <- data.frame(X1=600.0, X2=650.0, X3=2.5, X4=3.8)
+predict(gpa.mlr,new_student, interval="predict")
+
+#Use gpa.mlr for confidence interval for mu_Y
+predict(gpa.mlr,new_student, interval="confidence")
+
+```
+<br>
+b. Explain in plain english what each interval represents.We will verify below that they are 95%-confidence intervals. Needless to say, your two explanations may not be identical.
+
+<br><br>
+c. Calculate the standard errors $SE(\mu_Y)$ and $SE(\hat{Y})$ using the matrix formulas from class. Print out each standard error with a label. (Note: I defined the new matrix x as a column matrix. If you define it as a row-matrix, it will affect some of your formulas.)
+
+``` {r, eval = TRUE}
+
+# first define x and calculate x^T*C*x and convert it to a scalar
+
+#new_x <- matrix(c(1, 600,650,2.5,3.8),ncol=1)
+
+
+# Standard error of mu_Y
+
+
+# Standard error of yhat for new obs.
+
+
+```
+<br>
+d. Note that both the types of interval for the new predictor values (600, 650, 2.4, 3.8) use the same point-estimate  $\hat{Y} = x^T\hat{\beta}$. Calculate this point-estimate and verify that it equals the value we found in Part (a). Also, turn it into a scalar so we can use it for the confidence intervals in Part (e).
+```{r, eval = TRUE}
+
+
+```
+<br>
+e. Now use $t_{0.975, n-k}$ to reproduce the 95% - confidence intervals we found in Part (a). Print each with a label (the label can be on the previous line) along with lower.bound and upper.bound.
+<br>
+```{r, eval=TRUE}
+
+# confidence interval for average of all new observations
+# with predictors = (600, 650, 2.4, 3.8)
+
+#CI_muy.lower <- 
+#CI_muy.upper <- 
+# print("The upper and lower bounds of the confidence interval for mu_Y are")
+# print(c(CI_muy.lower, CI_muy.upper))
+
+
+
+# Now do prediction interval for gpa of a single new observation
+# with predictors = (600, 650, 2.4, 3.8)
+
+```
+
+***f. Feel some satisfaction at being able to reproduce the output of `lm` for a multi-linear regression. You now know how to calculate a linear regression and how to properly use it for prediction. Next in the course, we will learn to decide between different models to choose the "best" one.***
+
+

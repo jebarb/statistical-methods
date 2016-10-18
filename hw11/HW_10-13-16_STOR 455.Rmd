@@ -1,0 +1,155 @@
+# Homework 11 Assigned 10/13/16
+
+**Created by Robin Cunningham, UNC Chapel Hill**
+
+output: html_document
+
+Intro to Multiple Linear Regression
+-------------------------
+<br><br>
+***GPA Data Set***
+
+*We will use this exercise to compare the regression coefficients that we find by solving the Normal Equations (Slide 9 of Lecture 5) to the Output from using `lm` to find the regression coefficients.*
+
+
+1. Get the data set "College GPA.csv" and put it in your working directory along with this document and the console of R-Studio. Note that all of the code boxes below are set to `eval=FALSE` so that your file will *knit* but you will need to change this to put out your answers.
+<br><br>
+a. Read in the GPA file and assign it to the handy name provided.Then go ahead and print it so you have it for reference.
+    ```{r q1_load, eval = TRUE}
+    #gpa <- 
+    gpa = read.csv("College GPA.csv")
+    head(gpa)
+    summary(gpa)
+    ```
+b. Create each of the Matrices, X, Y, and Beta_hat that you will need to solve the normal equations.
+    \[
+       X\hat{B} =Y
+    \]
+Begin by defining variables 
+    \[
+       Y = First year GPA
+    \]
+    \[
+       X1 = Math SAT
+    \]
+    \[
+       X2 = Verbal SAT
+    \]
+    \[
+       X3 = HS Math GPA
+    \]
+    \[
+       X4 = HS English GPA.
+    \]
+Then initialize a Beta_hat vector of all zeros and the appropriate length.
+    ```{r q1a, eval = TRUE}
+    n <- nrow(gpa)
+    Y <- gpa$First.Yr.GPA
+    X1 <- gpa$Math.SAT
+    X2 <- gpa$Verbal.SAT
+    X3 <- gpa$HS.Math.GPA
+    X4 <- gpa$HS.English.GPA
+    Beta_hat <- numeric(n)
+    ```
+b. We have our variables now, but they are all stored as vectors and we must convert them to matrices. Use `cbind` to create the matrix X. You will need to create a vector of 1's of the appropriate length first. Also, use the `matrix` command to turn Y and Beta_hat into matrices with the correct dimensions. After you have made them, go ahead and print (with labels) all three Matrices for the normal equations with labels.
+    ```{r, eval=TRUE}
+  #Change Beta_hat to a matrix
+    Beta_hat = matrix(Beta_hat)
+  #Change Y to a matrix
+    Y = matrix(Y)
+  #create X 
+  # First create column of ones and convert Xi to columns
+    X = c(rep(1, n))
+  # make matrix X
+    X = cbind(X, X1, X2, X3, X4, deparse.level = 0)
+
+    ```
+
+<br>
+c. Calculate the least squares values of Beta_hat.  In the calculation of the least squares values, I recommend calculating X^tX first, then the inverse, then Beta_hat.
+<br>
+I went ahead and wrote the code to print out the Beta_i values after they are calculated.
+```{r, eval=TRUE}
+  #Calculate Beta_hat
+  Beta_hat = solve(t(X)%*%X)%*%t(X)%*%Y
+
+  #Print individual values of Beta_i
+  labels = matrix(c("Beta_0", "Beta_1", "Beta_2", "Beta_3", "Beta_4"), nrow = 5)
+  beta_summary <- cbind(labels, Beta_hat)
+  beta_summary
+```
+d. Now that you know how `lm` calculates these coefficients, it is ok to use `lm` directly to calculate the least-squares statistics. Do that here and assign the model to the name gpa.mlr. Then get the summary output of the model.
+    ```{r, eval=TRUE}
+    gpa.mlr = lm(Y ~ X1+X2+X3+X4)
+    summary(gpa.mlr)
+    ```
+    <br>
+e. How do your estimates of the parameters compare to R's?(Comment box below)
+
+```
+They are exactly the same
+```
+f. Interpret each of the regression paramaters in words. That is, explain what each value means in terms of the scenario.
+```
+intercept: for 0 GPA and SAT scores, avg first year GPA will be 0.16
+beta_3: Rate at which math GPA causes first year GPA while X1,X2,X4 are constant
+beta_1,2,4: see beta_3, replace relevant variables
+```
+g. Find a 95% confidence interval for $\beta_4$.(Use either a code-box, a comment box, or both to hold your answer.)
+``` {r}
+    confint(gpa.mlr)
+```
+<br>
+
+h. For a new individual with
+<br>
+MSAT = 640<br>
+VSAT = 540<br>
+HSM = 3.8<br>
+HSE = 3.2<br>
+What is your best estimate for their 1st-year gpa? 
+<br> Please use R to give your answer.
+```{r}
+X1 = c(640)
+X2 = c(540)
+X3 = c(3.8)
+X4 = c(3.2)
+predict(gpa.mlr, data.frame(X1, X2, X3, X4))
+```
+
+<br>
+i. For the person described in Part (h), find a 95% confidence interval for their 1st-year gpa. (Note that s^2 is given in the R output of the linear model.)
+```{r}
+predict(gpa.mlr, data.frame(X1, X2, X3, X4), interval="confidence", level=0.95)
+
+```
+<br>
+j. We should have done this to start the regression analysis, but make plots of Y versus each of the predictors (4 plots) and discuss what you see. (Try to get everything into this RMarkdown document. No paper this time.)
+```{r}
+    X1 <- gpa$Math.SAT
+    X2 <- gpa$Verbal.SAT
+    X3 <- gpa$HS.Math.GPA
+    X4 <- gpa$HS.English.GPA
+    plot(Y, X1, main="Y vs Predictor", ylab="First Year GPA", xlab="Math SAT", col="blue")
+    plot(Y, X2, main="Y vs Predictor", ylab="First Year GPA", xlab="Verbal SAT", col="blue")
+    plot(Y, X3, main="Y vs Predictor", ylab="First Year GPA", xlab="HS Math GPA", col="blue")
+    plot(Y, X4, main="Y vs Predictor", ylab="First Year GPA", xlab="HS English GPA", col="blue")
+```
+<br>
+k. Makes histograms of each of the variables to see if there are any obvious outliers or other odd behavior. Print the histograms and any comments.
+```{r}
+hist(X1, breaks=10, main="Math SAT", xlab="Score", col="grey", freq=FALSE)
+hist(X2, breaks=10, main="Verbal SAT", xlab="Score", col="grey", freq=FALSE)
+hist(X3, breaks=10, main="HS Math GPA", xlab="GPA", col="grey", freq=FALSE)
+hist(X4, breaks=10, main="HS English GPA", xlab="GPA", col="grey", freq=FALSE)
+# There are definite outliers in the HS Math GPA, it seems a disproportionately large amount of students got below a 1.75 GPA
+```
+<br>
+l. Plot residuals versus fitted values (Y-hat_i) and the QQ plot of residuals. It is ok to use `lm` for this. Include any comments on what these diagnostic plots indicate.
+
+```{r}
+plot(gpa.mlr, which=1)
+```
+
+m. Find a 95% prediction interval for the individual described in Part (h) above. It is ok to use R's `predict` function for this. Interpret the result in terms of the scenario.
+
