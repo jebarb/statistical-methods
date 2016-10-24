@@ -138,10 +138,10 @@ j. We should have done this to start the regression analysis, but make plots of 
 <br>
 k. Makes histograms of each of the variables to see if there are any obvious outliers or other odd behavior. Print the histograms and any comments.
 ```{r}
-hist(X1, breaks=10, main="Math SAT", xlab="Score", col="grey", freq=FALSE)
-hist(X2, breaks=10, main="Verbal SAT", xlab="Score", col="grey", freq=FALSE)
-hist(X3, breaks=10, main="HS Math GPA", xlab="GPA", col="grey", freq=FALSE)
-hist(X4, breaks=10, main="HS English GPA", xlab="GPA", col="grey", freq=FALSE)
+hist(X1, main="Math SAT", xlab="Score", col="grey", freq=FALSE)
+hist(X2, main="Verbal SAT", xlab="Score", col="grey", freq=FALSE)
+hist(X3, main="HS Math GPA", xlab="GPA", col="grey", freq=FALSE)
+hist(X4, main="HS English GPA", xlab="GPA", col="grey", freq=FALSE)
 # There are definite outliers in the HS Math GPA, it seems a disproportionately large amount of students got below a 1.75 GPA
 ```
 <br>
