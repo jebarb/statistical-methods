@@ -146,14 +146,18 @@ a. We learned in class that the matrix $$(X^{t}X)^{-1}$$ basically gives us the 
 ``` {r, eval = TRUE}
 # Assign the right matrix to the variable C.
 # C <- 
+C = solve(t(X)%*%X)
+C
 
 ```
 b. As we learned in class, the squares of the Standard Errors of the coefficients are given by the diagonal elements of the matrix $$s^{2}C.$$ So to reproduce those, we need to produce $s^2$. We could just square the ***residual standard error*** (0.2685) in the output of lm, but we can also calculate it with matrices by going through SSE and the degrees of freedom of SSE. In the code block below, use matrix equations from class to calculate the matrix of residuals ("e-hat") and SSE. Print out SSE.
 
 ``` {r, eval = TRUE}
 # Calculate SE(Beta_3) by hand
-# ehat = 
-#SSE <- 
+ehat = Y - X%*%Beta_hat
+SSE = t(ehat)%*%ehat
+ehat
+SSE
 
 ```
 <br>
@@ -162,18 +166,20 @@ c. Now calculate $s = \sqrt{MSE}$ using the fact that the degrees of freedom of 
 ``` {r, eval = TRUE}
 # Calculate s by hand.
 #n and k were found above.
-
+MSE = SSE/(n-k-1)
+s = sqrt(MSE)
+s
 ```
 
 d. Well that is reassuring. It looks like we can trust R's output for $s$. Now print the matrix $s^{2}C$ and view the squares of the SE(Beta_i)'s on the diagonal. Unfortunately, R still considers $s$ to be a 1X1 matrix, so we have to convert it to a scalar first, before multiplying by $C$. I have done this step for you.
 ``` {r, eval = TRUE}
 # view the diagonal after converting s to a number and calculating s^2*C.
-#s <- as.numeric(s)
-
+s <- as.numeric(s)
+s^2 * C
 ```
 
 e. You can view the actual Standard Errors of the Coefficients by looking at the square-root of $s^2 C$, but it would be more satisfying to produce a matrix of `my_SEs`. Write a do-loop to do this
-``` {r, eval = FALSE}
+``` {r, eval = TRUE}
 # Make a vector of my_SEs
 # I did it for you, but inspect the code please!!
 my_SEs <- numeric(k) # one term for each coefficient
@@ -200,6 +206,9 @@ predict(gpa.mlr,new_student, interval="confidence")
 ```
 <br>
 b. Explain in plain english what each interval represents.We will verify below that they are 95%-confidence intervals. Needless to say, your two explanations may not be identical.
+```
+The interval 'predict' gives an interval of the predicted result from given values. The interval 'confidence' gives you the confidence that the predicted result will lie within an interval.
+```
 
 <br><br>
 c. Calculate the standard errors $SE(\mu_Y)$ and $SE(\hat{Y})$ using the matrix formulas from class. Print out each standard error with a label. (Note: I defined the new matrix x as a column matrix. If you define it as a row-matrix, it will affect some of your formulas.)
@@ -208,7 +217,10 @@ c. Calculate the standard errors $SE(\mu_Y)$ and $SE(\hat{Y})$ using the matrix 
 
 # first define x and calculate x^T*C*x and convert it to a scalar
 
-#new_x <- matrix(c(1, 600,650,2.5,3.8),ncol=1)
+new_x <- matrix(c(1, 600,650,2.5,3.8),ncol=1)
+
+res = as.numeric(t(new_x)%*%C%*%new_x)
+res
 
 
 # Standard error of mu_Y

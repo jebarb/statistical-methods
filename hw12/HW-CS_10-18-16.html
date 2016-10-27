@@ -335,21 +335,66 @@ summary(gpa.mlr)</code></pre>
 </ol>
 <p><br><br><br> <strong><em>2. Parts (a) through (e) above hopefully built our confidence regarding R, regarding the matrix algebra involved in finding the regression coefficients and in our ability to produce the regression coefficients by hand. <br><br> In this question, we will see how to reproduce the Standard Errors of each coefficient using matrix algebra. It turns out there is not much work for this, just a couple of tricks. <br> Please render all answers using RMarkdown (no paper).</em></strong> <br> a. We learned in class that the matrix <span class="math display">\[(X^{t}X)^{-1}\]</span> basically gives us the Standard Errors for the coefficients. This matrix is so important that it is often called <span class="math inline">\(C\)</span>. Assign the appropriate matrix to the variable name <span class="math inline">\(C\)</span> and print the matrix.</p>
 <pre class="r"><code># Assign the right matrix to the variable C.
-# C &lt;- </code></pre>
+# C &lt;- 
+C = solve(t(X)%*%X)
+C</code></pre>
+<pre><code>##               [,1]          [,2]          [,3]          [,4]          [,5]
+## [1,]  2.6551249569  1.378434e-03 -3.619435e-04 -0.2006841873 -0.8521280877
+## [2,]  0.0013784337  4.737481e-06 -4.015517e-07 -0.0003559377 -0.0008620172
+## [3,] -0.0003619435 -4.015517e-07  4.218802e-06 -0.0001953018 -0.0002966849
+## [4,] -0.2006841873 -3.559377e-04 -1.953018e-04  0.1170561208  0.0472194123
+## [5,] -0.8521280877 -8.620172e-04 -2.966849e-04  0.0472194123  0.4320523096</code></pre>
 <ol start="2" style="list-style-type: lower-alpha">
 <li>As we learned in class, the squares of the Standard Errors of the coefficients are given by the diagonal elements of the matrix <span class="math display">\[s^{2}C.\]</span> So to reproduce those, we need to produce <span class="math inline">\(s^2\)</span>. We could just square the <strong><em>residual standard error</em></strong> (0.2685) in the output of lm, but we can also calculate it with matrices by going through SSE and the degrees of freedom of SSE. In the code block below, use matrix equations from class to calculate the matrix of residuals (“e-hat”) and SSE. Print out SSE.</li>
 </ol>
 <pre class="r"><code># Calculate SE(Beta_3) by hand
-# ehat = 
-#SSE &lt;- </code></pre>
+ehat = Y - X%*%Beta_hat
+SSE = t(ehat)%*%ehat
+ehat</code></pre>
+<pre><code>##                [,1]
+##  [1,]  1.878889e-01
+##  [2,] -4.432831e-01
+##  [3,] -2.045301e-01
+##  [4,]  1.969090e-01
+##  [5,] -1.180735e-01
+##  [6,]  1.160314e-01
+##  [7,]  4.713469e-02
+##  [8,]  5.145672e-03
+##  [9,]  3.329036e-01
+## [10,] -4.110088e-06
+## [11,] -1.010035e-01
+## [12,] -4.247613e-01
+## [13,] -1.196788e-01
+## [14,]  5.389964e-01
+## [15,] -1.647828e-01
+## [16,]  2.798164e-01
+## [17,]  2.863827e-02
+## [18,] -1.544600e-01
+## [19,]  3.739219e-02
+## [20,] -4.027917e-02</code></pre>
+<pre class="r"><code>SSE</code></pre>
+<pre><code>##          [,1]
+## [1,] 1.081499</code></pre>
 <p><br> c. Now calculate <span class="math inline">\(s = \sqrt{MSE}\)</span> using the fact that the degrees of freedom of SSE is <span class="math inline">\(n-k\)</span>. Print <span class="math inline">\(s\)</span> and verify that it equals the residual standard error.</p>
 <pre class="r"><code># Calculate s by hand.
-#n and k were found above.</code></pre>
+#n and k were found above.
+MSE = SSE/(n-k-1)
+s = sqrt(MSE)
+s</code></pre>
+<pre><code>##           [,1]
+## [1,] 0.2779387</code></pre>
 <ol start="4" style="list-style-type: lower-alpha">
 <li>Well that is reassuring. It looks like we can trust R’s output for <span class="math inline">\(s\)</span>. Now print the matrix <span class="math inline">\(s^{2}C\)</span> and view the squares of the SE(Beta_i)’s on the diagonal. Unfortunately, R still considers <span class="math inline">\(s\)</span> to be a 1X1 matrix, so we have to convert it to a scalar first, before multiplying by <span class="math inline">\(C\)</span>. I have done this step for you.</li>
 </ol>
 <pre class="r"><code># view the diagonal after converting s to a number and calculating s^2*C.
-#s &lt;- as.numeric(s)</code></pre>
+s &lt;- as.numeric(s)
+s^2 * C</code></pre>
+<pre><code>##               [,1]          [,2]          [,3]          [,4]          [,5]
+## [1,]  0.2051081739  1.064839e-04 -2.796010e-05 -1.550284e-02 -6.582682e-02
+## [2,]  0.0001064839  3.659700e-07 -3.101983e-08 -2.749616e-05 -6.659075e-05
+## [3,] -0.0000279601 -3.101983e-08  3.259021e-07 -1.508704e-05 -2.291888e-05
+## [4,] -0.0155028362 -2.749616e-05 -1.508704e-05  9.042575e-03  3.647696e-03
+## [5,] -0.0658268213 -6.659075e-05 -2.291888e-05  3.647696e-03  3.337600e-02</code></pre>
 <ol start="5" style="list-style-type: lower-alpha">
 <li>You can view the actual Standard Errors of the Coefficients by looking at the square-root of <span class="math inline">\(s^2 C\)</span>, but it would be more satisfying to produce a matrix of <code>my_SEs</code>. Write a do-loop to do this</li>
 </ol>
@@ -360,6 +405,7 @@ for (i in 1:k){
         my_SEs[i] = sqrt(s^2*C[i,i])
 }
 my_SEs</code></pre>
+<pre><code>## [1] 0.4528886992 0.0006049545 0.0005708783 0.0950924563 0.1826910059</code></pre>
 <p><br><br><br></p>
 <p><strong><em>3. The last thing we have to look at before model selection is prediction intervals for <span class="math inline">\(\hat{Y}\)</span> and confidence intervals for <span class="math inline">\(\mu_Y\)</span>. The idea is that a new student comes along with a set of SAT scores and High School grades and we want to make a confidence interval for their 1st-year GPA at university. </em></strong> <br> a. We will switch up the order this time and first use R to calculate the confidence interval for <span class="math inline">\(\mu_Y\)</span> and the prediction interval for <span class="math inline">\(\hat{Y}\)</span>. I will even give you the code:</p>
 <pre class="r"><code>#Use gpa.mlr for predition interval
@@ -372,13 +418,16 @@ predict(gpa.mlr,new_student, interval=&quot;confidence&quot;)</code></pre>
 <pre><code>##        fit      lwr      upr
 ## 1 2.987921 2.673148 3.302695</code></pre>
 <p><br> b. Explain in plain english what each interval represents.We will verify below that they are 95%-confidence intervals. Needless to say, your two explanations may not be identical.</p>
+<pre><code>The interval 'predict' gives an interval of the predicted result from given values. The interval 'confidence' gives you the confidence that the predicted result will lie within an interval.</code></pre>
 <p><br><br> c. Calculate the standard errors <span class="math inline">\(SE(\mu_Y)\)</span> and <span class="math inline">\(SE(\hat{Y})\)</span> using the matrix formulas from class. Print out each standard error with a label. (Note: I defined the new matrix x as a column matrix. If you define it as a row-matrix, it will affect some of your formulas.)</p>
 <pre class="r"><code># first define x and calculate x^T*C*x and convert it to a scalar
 
-#new_x &lt;- matrix(c(1, 600,650,2.5,3.8),ncol=1)
+new_x &lt;- matrix(c(1, 600,650,2.5,3.8),ncol=1)
 
-
-# Standard error of mu_Y
+res = as.numeric(t(new_x)%*%C%*%new_x)
+res</code></pre>
+<pre><code>## [1] 0.3024903</code></pre>
+<pre class="r"><code># Standard error of mu_Y
 
 
 # Standard error of yhat for new obs.</code></pre>
