@@ -1,0 +1,114 @@
+# Multi-linear regression.
+
+**Created by Robin Cunningham, UNC Chapel Hill**
+
+***HOMEWORK 13 - Predicting Baby-weight***
+<br><br>
+A Multi-linear regression analysis. **Please compose all answers in this R-Markdown document**.
+<br><br>
+1. A file containing data on 1236 live births can be found at
+'https://drive.google.com/open?id=0B2lwGKhIFjYYbDY3eWVubEZzX28'. We will use this dataset to construct a multi-linear model for predicting birthweight from other variables.
+<br><br>
+a. Write and execute code to read the csv file 'babies.csv', assign it to the object 'babies' and summarize the variables.
+```{r, eval=TRUE}
+
+```
+<br>
+b. As you can see, there are 8 variables and a fair number of missing data points. Remove all cases with missing data and assign the resulting data frame to 'bbycomp'.
+```{r, eval=TRUE}
+
+```
+<br>
+c. A **Dataset Codebook** is a guide to what each of the variables represents. Note that for the purpose of this study, we will consider each variable to be numerical. Complete the comment box below to create a codebook for these data. Include units if you can figure them out.
+```
+Variables:
+i. Case - 
+ii. bwt - 
+iii. gestation - 
+iv. parity - 
+v. age - 
+vi. height - 
+vii. weight - 
+viii. smoke -
+
+```
+<br>
+d.Do some exploratory analysis by looking at histograms of the 7 variables and plots of bwt versus each of the six explanatory variables. In the comment box below, make a note of any concerns. ***It will save some typing to assign the right variables to `Y, X1, ..., X6`, so I did that for you.***
+```{r, eval =FALSE}
+
+#Assign Short variable names
+Y<- bbycomp$bwt
+X1 <- bbycomp$gestation
+X2 <- bbycomp$parity
+X3 <- bbycomp$age
+X4 <- bbycomp$height
+X5 <- bbycomp$weight
+X6 <- bbycomp$smoke
+
+#Histograms
+
+
+#Plots of Y versus X_i
+
+```
+```
+Comments:
+
+
+```
+<br>
+e. Run the full model using all of the other variables (besides Case) to explain Birthweight (bwt). Store the model as `full.lm` and create a summary of the model.
+```{r, eval=TRUE}
+      
+```
+<br>
+f. Use the summary to conduct an ANOVA test to see if at least one of the coefficients is significantly different from zero. State the results in the comment box below.
+```
+
+```
+g. Now perform backward elimination in the following manner: First, eliminate the predictor whose removal causes the greatest improvement in adjusted R-squared. Continue in this manner until removing any remaining predictors causes Adjusted R-squared to fall. <br>
+Begin by finding the 5-predictor model that increases adjusted R-squared by the most. Include the model and summary in the codebox below.
+```{r, eval=TRUE}
+
+
+```
+<br>
+h. Should we stick with the 6-predictor model or continue? Explain.
+```
+
+```
+<br>
+i. Now find the best 4-variable model using the same criterion and include it in the code box below. Include a summary of the model.
+```{r, eval=TRUE}
+
+
+```
+<br>
+j. According to the Adj. R-squared criterion, should we stick with 5-predictors or continue? Explain.
+```
+
+
+
+```
+***Note: even though our criterion says to stick with 5 predictors, I would seriously consider dropping X5 anyway, because the p-value is very close to 0.05 and we have lots of predictors. (Think about why having lots of predictors matters for this!) Also, the value of Adjusted R-squared is only reduced slightly and a parsimonious model is easier to understand and more robust for predictions***
+k. Using the best 5-predictor model that you found, find a 95% confidence interval for the average birthweight among all babies for which (gestation, parity, age, height, weight, smoke) = (290, 1, 22, 60, 110, 0). (One line of code will do it.)
+```{r, eval= TRUE}
+```
+<br>
+l. Using the best 5-predictor model that you found, find a 95% confidence interval for the birthweight of the next baby for which (gestation, parity, age, height, weight, smoke) = (290, 1, 22, 60, 110, 0). (Again, don't make it hard ... one line.)
+```{r, eval= TRUE}
+```
+<br>
+m. In plain English, interpret the coefficients in the least squares model for `height` and `smoke`.
+```
+
+```
+<br><br>
+2. Run diagnostics on the final 5-predictor model you selected. Include appropriate residual plots and your comments on the quality and usefulness of the fit. (Make your own codeboxes and comment boxes.)
+<br><br>
+3. In the plots you created before doing any regressions, there were apparent outliers with regard to both X1 and X4. Without doing the work, say what steps you would take to evaluate whether we should consider removing these outliers. (Your own comment box.)
+<br><br>
+4. Using `Forward Addition`, choose a "best" multilinear model for this data set. Begin by choosing the single predictor that gives the highest value of Adjusted R-squared and continue by adding variables until Adjusted R-squared has been maximized. ***Your answer should consist of a set of nested models with increasing Adjusted R-squared***
+<br><br>
+5. For the sequence of nested models above, conduct an ANOVA test comparing each model to the previous, reduced model to see if the new coefficient is statistically different from zero compared to the reduced model. Show the code for each test and state the results.
+
