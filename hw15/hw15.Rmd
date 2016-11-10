@@ -1,0 +1,164 @@
+---
+title: "hw15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+evals = read.csv("evals.csv")
+head(evals)
+summary(evals)
+```
+<br><br>
+Exercise 1:
+
+``` 
+This is an observational study.
+```
+<br><br>
+Exercise 2:
+
+``` {r}
+hist(evals$score, main="Course Score", xlab="Score", col="grey", freq=FALSE)
+qqnorm(evals$score)
+#The distribution of score is skewed left, otherwise would be normal. This tells us that students tend to rate courses higher than the middle of the scale on average, reserving lower scores for serious conditions. This is an expected distribution for subjective scores or ratings.
+```
+<br><br>
+
+Exercise 3:
+```{r}
+plot(evals$rank, evals$score, main="Y vs Predictor", ylab="Score", xlab="Professor Rank", col="blue")
+hist(evals$cls_perc_eval, main="Percentage of students who completed eval", xlab="Percent", col="grey", freq=FALSE)
+plot(evals$cls_perc_eval, evals$score, main="Y vs Predictor", ylab="Score", xlab="Percent of students who completed eval", col="blue")
+
+#Professor rank seems to have an impact on course score, specifically teaching professors seem to perform better.
+#Percentage of students who completed evaluations also seems to correlate with the score, with higher-percentage evals leading to higher overall course score
+```
+<br><br>
+```{r}
+plot(evals$score ~ evals$bty_avg)
+```
+
+<br><br>
+Exercise 4:
+```{r}
+plot(evals$score ~ jitter(rep(evals$bty_avg)))
+#The original plot hid values as there were many points laid on top of one another
+```
+
+Exercise 5:
+<br><br>
+```{r}
+m_bty = lm(score ~ bty_avg, data=evals)
+summary(m_bty)
+plot(score ~ bty_avg, data=evals)
+abline(m_bty)
+# equation: bty = 0.06664 * bty_avg + 388034
+# Based solely on the p-value, average beauty seems to be a statistically significant predictor
+```
+Exercise 6:
+<br><br>
+```{r}
+plot(m_bty)
+# Based on the diagnostic plots, especially the normal Q-Q plot, the model does not seem to be a good fit.
+```
+Exercise 7:
+<br><br>
+```{r}
+plot(evals$bty_avg ~ evals$bty_f1lower)
+cor(evals$bty_avg, evals$bty_f1lower)
+plot(evals[,13:19])
+m_bty_gen <- lm(score ~ bty_avg + gender, data = evals)
+summary(m_bty_gen)
+plot(m_bty_gen)
+```
+Exercise 8:
+<br><br>
+```{r}
+# Again, based on p-value, bty_average seems to be a significant predictor of score but the linear model again seems to be non-normal
+```
+Exercise 9:
+<br><br>
+```{r}
+# plot score versus bty_avg and include the regression lines for males and females on the same plot (in different colors!)
+plot(score ~ bty_avg, data=evals)
+abline(a = 3.74734, b = .07416, col="pink")
+abline(a = (3.74734 + .17239), b = .07416, col="blue")
+# The equation is score = 0.07416 * bty_avg + 0.17239 + 3.374734
+# Males seem to give higher scores
+```
+Exercise 10:
+<br><br>
+```{r}
+m_bty_rank <- lm(score ~ bty_avg + rank, data = evals)
+summary(m_bty_rank)
+plot(m_bty_rank)
+# R creates (n-1) predictors for n categorical variables
+```
+Exercise 11:
+<br><br>
+```{r}
+# I would expect the number of professors to have a high p-value
+
+```
+Exercise 12:
+<br><br>
+```{r}
+m_full <- lm(score ~ rank + ethnicity + gender + language + age + cls_perc_eval + cls_students + cls_level + cls_profs + cls_credits + bty_avg + pic_outfit + pic_color, data = evals)
+summary(m_full)
+
+# The number of professors in a class has the highest p-value
+```
+Exercise 13:
+<br><br>
+```{r}
+# The coefficient for ethnicity states for professors who are not a minority, scores are generally 0.1234929 points higher than those of minority professors
+```
+Exercise 14:
+<br><br>
+```{r}
+m_partial <- lm(score ~ rank + ethnicity + gender + language + age + cls_perc_eval + cls_students + cls_level + cls_credits + bty_avg + pic_outfit + pic_color, data = evals)
+summary(m_partial)
+# The coefficients and significance did change. This indicates the dropped variable was not collinear with the other values.
+```
+Exercise 15:
+<br><br>
+```{r}
+m_partial <- lm(score ~ rank + ethnicity + gender + language + age + cls_perc_eval + cls_students + cls_credits + bty_avg + pic_outfit + pic_color, data = evals)
+summary(m_partial)
+m_partial <- lm(score ~ rank + ethnicity + gender + language + age + cls_perc_eval + cls_credits + bty_avg + pic_outfit + pic_color, data = evals)
+summary(m_partial)
+m_partial_bad <- lm(score ~ ethnicity + gender + language + age + cls_perc_eval + cls_credits + bty_avg + pic_outfit + pic_color, data = evals)
+summary(m_partial_bad)
+
+# m_partial is best model
+```
+Exercise 16:
+<br><br>
+```{r}
+plot(m_partial)
+# q-q plot still indicates this is not a great linear, normal model
+```
+Exercise 17:
+<br><br>
+```{r}
+# Absolutely, professors who teach many courses can skew the data. This will lead to an inaccurate linear model
+```
+Exercise 18:
+<br><br>
+```{r}
+# A professor with a high eval score will be a teaching professor, non-minority, male, english speaker, young, have high evaluation rates, teach high-credit courses, be attractive, dress formally for pictures, and have their pictures be in color
+```
+Exercise 19:
+<br><br>
+```{r}
+# I would not. The model is a poor fit, the data is skewed by the methodology of data selection and organization, predictors such as info about photos and beauty ratings seem to have little predictive value, and the study was from an single university
+```
+Exercise 20:
+<br><br>
+```{r}
+# ELECTORAL COLLEGE!
+```
