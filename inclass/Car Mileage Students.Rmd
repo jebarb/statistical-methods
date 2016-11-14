@@ -1,0 +1,23 @@
+---
+title: "Car Mileage - For Class on Tuesday, please load the data set and `print' it. The code is already written for you."
+author: "Created by Robin Cunningham"
+date: "November 13, 2016"
+output: html_document
+---
+<br><br>
+
+## Linear Model
+
+There is a very small data set 'mileage.csv'  on Sakai that shows car mileage versus car speed for a random sample of vehicles. Load the data set, conduct some exploratory analysis, obtain a least squares line for the data and check some associated diagnostics.
+```{r, eval=TRUE}
+cars <- read.csv("mileage.csv", header=TRUE)
+cars
+
+```
+
+<br><br>
+## Try quadratic model (we will do this in class)
+
+```{r, eval=TRUE}
+
+```
