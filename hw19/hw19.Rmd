@@ -1,0 +1,43 @@
+Exercise 1:
+```{r, eval=TRUE}
+fert = read.csv("Fertilizer Experiment.csv")
+summary(fert)
+print(fert)
+```
+
+<br><br>
+Exercise 2:
+```{r, eval=TRUE}
+fit <- lm(fert$Yield ~ fert$Nitrogen)
+summary(fit)
+plot(fit)
+plot(fert$Yield ~ fert$Nitrogen)
+abline(fit)
+
+```
+
+<br><br>
+Exercise 3:
+```{r, eval=TRUE}
+
+```
+
+<br><br>
+Exercise 4:
+```{r, eval=TRUE}
+
+```
+
+<br><br>
+Exercise 5:
+```{r, eval=TRUE}
+
+```
+
+<br><br>
+Exercise 1:
+```{r, eval=TRUE}
+
+```
+
+<br><br>
