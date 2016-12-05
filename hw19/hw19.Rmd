@@ -1,6 +1,6 @@
 Exercise 1:
 ```{r, eval=TRUE}
-fert = read.csv("Fertilizer Experiment.csv")
+fert = read.csv("Fertilizer Experiment.csv", header=TRUE)
 summary(fert)
 print(fert)
 ```
@@ -8,36 +8,105 @@ print(fert)
 <br><br>
 Exercise 2:
 ```{r, eval=TRUE}
-fit <- lm(fert$Yield ~ fert$Nitrogen)
+fit = lm(fert$Yield ~ fert$Nitrogen)
 summary(fit)
-plot(fit)
+plot(fit, which = 1:2)
 plot(fert$Yield ~ fert$Nitrogen)
 abline(fit)
-
 ```
 
 <br><br>
 Exercise 3:
 ```{r, eval=TRUE}
-
+fert = read.csv("Fertilizer Experiment.csv", header=TRUE)
+fert$nitrogen_squared <- fert$Nitrogen^2
+fert
+quad_fit = lm(Yield ~ Nitrogen + nitrogen_squared, data = fert)
+summary(quad_fit)
+plot(quad_fit, which = 1:2)
+library(car)
+vif(quad_fit)
+xvalues = seq(0, 200, 0.1)
+newfert = data.frame(Nitrogen=xvalues, nitrogen_squared=xvalues^2)
+predyield = predict(quad_fit, newfert)
+plot(fert$Yield ~ fert$Nitrogen, xlab = "Nitrogen", ylab = "Yield")
+lines(xvalues, predyield)
+xbar <- mean(fert$Nitrogen)
+xbar
+fert$Nitrogenc <- fert$Nitrogen - xbar
+fert$Nitrogenc2 <- fert$Nitrogenc^2
+fert
+quad_fit_c <- lm(Yield ~ Nitrogenc + Nitrogenc2, data = fert)
+summary(quad_fit_c)
+plot(quad_fit_c, which = 1:2)
+vif(quad_fit_c)
+xvalues = seq(-100, 100, 0.1)
+newfert = data.frame(Nitrogenc=xvalues, Nitrogenc2=xvalues^2)
+predyield = predict(quad_fit_c, newfert)
+plot(fert$Yield ~ fert$Nitrogenc, xlab = "Nitrogen", ylab = "Yield")
+lines(xvalues, predyield)
 ```
 
 <br><br>
 Exercise 4:
 ```{r, eval=TRUE}
-
+fert = read.csv("Fertilizer Experiment.csv", header=TRUE)
+fert$Nitrogen3 <- fert$Nitrogen^3
+fert
+quad_fit = lm(Yield ~ Nitrogen + Nitrogen3, data = fert)
+summary(quad_fit)
+plot(quad_fit, which = 1:2)
+library(car)
+vif(quad_fit)
+xvalues = seq(0, 200, 0.1)
+newfert = data.frame(Nitrogen=xvalues, Nitrogen3=xvalues^3)
+predyield = predict(quad_fit, newfert)
+plot(fert$Yield ~ fert$Nitrogen, xlab = "Nitrogen", ylab = "Yield")
+lines(xvalues, predyield)
+xbar <- mean(fert$Nitrogen)
+xbar
+fert$Nitrogenc <- fert$Nitrogen - xbar
+fert$Nitrogenc3 <- fert$Nitrogenc^3
+fert
+quad_fit_c <- lm(Yield ~ Nitrogenc + Nitrogenc3, data = fert)
+summary(quad_fit_c)
+plot(quad_fit_c, which = 1:2)
+vif(quad_fit_c)
+xvalues = seq(-100, 100, 0.1)
+newfert = data.frame(Nitrogenc=xvalues, Nitrogenc3=xvalues^2)
+predyield = predict(quad_fit_c, newfert)
+plot(fert$Yield ~ fert$Nitrogenc, xlab = "Nitrogen", ylab = "Yield")
+lines(xvalues, predyield)
 ```
 
 <br><br>
 Exercise 5:
 ```{r, eval=TRUE}
-
+fert = read.csv("Fertilizer Experiment.csv", header=TRUE)
+fert$Nit_by_20_squared <- fert$Nit_by_20^2
+fert
+quad_fit = lm(Yield ~ Nit_by_20 + Nit_by_20_squared, data = fert)
+summary(quad_fit)
+plot(quad_fit, which = 1:2)
+library(car)
+vif(quad_fit)
+xvalues = seq(0, 10, 0.1)
+newfert = data.frame(Nit_by_20=xvalues, Nit_by_20_squared=xvalues^2)
+predyield = predict(quad_fit, newfert)
+plot(fert$Yield ~ fert$Nit_by_20, xlab = "Nitrogen", ylab = "Yield")
+lines(xvalues, predyield)
+xbar <- mean(fert$Nit_by_20)
+xbar
+fert$Nit_by_20c <- fert$Nit_by_20 - xbar
+fert$Nit_by_20c2 <- fert$Nit_by_20c^2
+fert
+quad_fit_c <- lm(Yield ~ Nit_by_20c + Nit_by_20c2, data = fert)
+summary(quad_fit_c)
+plot(quad_fit_c, which = 1:2)
+vif(quad_fit_c)
+xvalues = seq(-5, 5, 0.1)
+newfert = data.frame(Nit_by_20c=xvalues, Nit_by_20c2=xvalues^2)
+predyield = predict(quad_fit_c, newfert)
+plot(fert$Yield ~ fert$Nit_by_20c, xlab = "Nitrogen", ylab = "Yield")
+lines(xvalues, predyield)
 ```
-
-<br><br>
-Exercise 1:
-```{r, eval=TRUE}
-
-```
-
-<br><br>
